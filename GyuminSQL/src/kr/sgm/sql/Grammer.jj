@@ -1,0 +1,67 @@
+options {
+  static = false;
+}
+
+PARSER_BEGIN(Parser)
+
+package kr.sgm.sql;
+
+public class Parser {
+  private static String PROMPT = "SQL_2009-11744> ";
+
+  public static void main(String[] args) {
+    while(true) {
+      System.out.println(PROMPT);
+      Parser parser = new Parser(System.in);
+      String result;
+      try {
+        result = parser.Parse();
+      }catch(ParseException ex) {
+        System.out.println("Syntax error");
+        continue;
+      }
+      System.out.print(PROMPT);
+      System.out.println(result);
+    }
+  }
+}
+
+PARSER_END(Parser)
+
+SKIP:
+{
+  " "
+| "\t"
+| "\r"
+| "\n"
+}
+
+TOKEN:
+{
+  < SEMICOLON: ";" >
+| < QUOTE: ["\'","\""] >
+| < NON_QUOTE_CHARACTER: ~["\'","\""] >
+| < ALPHABET: ["a"-"z","A"-"Z"] >
+| < SIGN: ["+","-"] >
+| < DIGIT: ["0"-"9"] >
+| < INT_VALUE: (<SIGN>)?(<DIGIT>)+ >
+| < NN: <DIGIT><DIGIT> >
+| < NNNN: <DIGIT><DIGIT><DIGIT><DIGIT> >
+| < DATE_VALUE: <NNNN>"-"<NN>"-"<NN> >
+| < CHAR_STRING: <QUOTE>(<NON_QUOTE_CHARACTER>)*<QUOTE> >
+}
+
+String Parse():
+{
+  Token t;
+  String result;
+}
+{
+  { result = ""; }
+  (
+    t = < CHAR_STRING >
+    { result += t.image; }
+  )*
+  < SEMICOLON >
+  { return result; }
+}
