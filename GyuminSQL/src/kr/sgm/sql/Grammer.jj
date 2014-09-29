@@ -74,6 +74,18 @@ TOKEN:
 
 TOKEN:
 {
+  < LEGAL_IDENTIFIER: <ALPHABET>([<ALPHABET>,<UNDERSCORE>])* >
+| < UNDER_SCORE: "_" >
+| < LEFT_PAREN: "(" >
+| < RIGHT_PAREN: ")" >
+| < COMMA: "," >
+| < STAR: "*" >
+| < PERIOD: "." >
+| < COMP_OP: "<"|">"|"="|"<="|">="|"!=" >
+}
+
+TOKEN:
+{
   < CHAR_STRING: <QUOTE>(~["\'"])*<QUOTE> >
 | < INT_VALUE: (<SIGN>)?(<DIGIT>)+ >
 | < DIGIT: ["0"-"9"] >
