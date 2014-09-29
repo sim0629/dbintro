@@ -44,6 +44,36 @@ TOKEN:
 
 TOKEN:
 {
+  < CREATE: "create" >
+| < TABLE: "table" >
+| < NOT: "not" >
+| < NULL: "null" >
+| < PRIMARY: "primary" >
+| < KEY: "key" >
+| < FOREIGN: "foreign" >
+| < REFERENCES: "references" >
+| < INT: "int" >
+| < CHAR: "char" >
+| < DATE: "date" >
+| < DROP: "drop" >
+| < SHOW: "show" >
+| < TABLES: "tables" >
+| < DESC: "desc" >
+| < SELECT: "select" >
+| < AS: "as" >
+| < FROM: "from" >
+| < WHERE: "where" >
+| < OR: "or" >
+| < AND: "and" >
+| < IS: "is" >
+| < INSERT: "insert" >
+| < INTO: "into" >
+| < VALUES: "values" >
+| < DELETE: "delete" >
+}
+
+TOKEN:
+{
   < CHAR_STRING: <QUOTE>(~["\'"])*<QUOTE> >
 | < INT_VALUE: (<SIGN>)?(<DIGIT>)+ >
 | < DIGIT: ["0"-"9"] >
