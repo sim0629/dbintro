@@ -4,42 +4,65 @@ package kr.sgm.sql;
 public class Parser implements ParserConstants {
   private static String PROMPT = "SQL_2009-11744> ";
 
+  private static void print(String message) {
+    System.out.print(PROMPT);
+    System.out.println(message);
+  }
+
   public static void main(String[] args) {
     while(true) {
-      System.out.println(PROMPT);
+      print("");
       Parser parser = new Parser(System.in);
-      String result;
       try {
-        result = parser.Parse();
+        if(parser.Parse()) break;
       }catch(ParseException ex) {
-        System.out.println("Syntax error");
-        continue;
+        print("Syntax error");
       }
-      System.out.print(PROMPT);
-      System.out.println(result);
     }
   }
 
-  final public String Parse() throws ParseException {
-  Token t;
-  String result;
-    result = "";
-    label_1:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case CHAR_STRING:
-        ;
-        break;
-      default:
-        jj_la1[0] = jj_gen;
-        break label_1;
+  final public boolean Parse() throws ParseException {
+  boolean exit;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case EXIT:
+      Exit();
+      exit = true;
+      break;
+    case INT_VALUE:
+      label_1:
+      while (true) {
+        Query();
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case INT_VALUE:
+          ;
+          break;
+        default:
+          jj_la1[0] = jj_gen;
+          break label_1;
+        }
       }
-      t = jj_consume_token(CHAR_STRING);
-      result += t.image;
+      exit = false;
+      break;
+    default:
+      jj_la1[1] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
-    jj_consume_token(SEMICOLON);
-    {if (true) return result;}
+    jj_consume_token(EOL);
+    {if (true) return exit;}
     throw new Error("Missing return statement in function");
+  }
+
+  final public void Exit() throws ParseException {
+    jj_consume_token(EXIT);
+    jj_consume_token(SEMICOLON);
+  }
+
+  final public void Query() throws ParseException {
+  Token t;
+    t = jj_consume_token(INT_VALUE);
+    jj_consume_token(SEMICOLON);
+    print(t.image);
   }
 
   /** Generated Token Manager. */
@@ -51,13 +74,13 @@ public class Parser implements ParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[1];
+  final private int[] jj_la1 = new int[2];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x8000,};
+      jj_la1_0 = new int[] {0x80,0x88,};
    }
 
   /** Constructor with InputStream. */
@@ -71,7 +94,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -85,7 +108,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -95,7 +118,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -105,7 +128,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -114,7 +137,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -123,7 +146,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -174,12 +197,12 @@ public class Parser implements ParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[16];
+    boolean[] la1tokens = new boolean[15];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 2; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -188,7 +211,7 @@ public class Parser implements ParserConstants {
         }
       }
     }
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 15; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

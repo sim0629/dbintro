@@ -9,19 +9,20 @@ package kr.sgm.sql;
 public class Parser {
   private static String PROMPT = "SQL_2009-11744> ";
 
+  private static void print(String message) {
+    System.out.print(PROMPT);
+    System.out.println(message);
+  }
+
   public static void main(String[] args) {
     while(true) {
-      System.out.println(PROMPT);
+      print("");
       Parser parser = new Parser(System.in);
-      String result;
       try {
-        result = parser.Parse();
+        if(parser.Parse()) break;
       }catch(ParseException ex) {
-        System.out.println("Syntax error");
-        continue;
+        print("Syntax error");
       }
-      System.out.print(PROMPT);
-      System.out.println(result);
     }
   }
 }
@@ -32,36 +33,59 @@ SKIP:
 {
   " "
 | "\t"
-| "\r"
-| "\n"
 }
 
 TOKEN:
 {
-  < SEMICOLON: ";" >
-| < QUOTE: ["\'","\""] >
-| < NON_QUOTE_CHARACTER: ~["\'","\""] >
-| < ALPHABET: ["a"-"z","A"-"Z"] >
-| < SIGN: ["+","-"] >
-| < DIGIT: ["0"-"9"] >
-| < INT_VALUE: (<SIGN>)?(<DIGIT>)+ >
-| < NN: <DIGIT><DIGIT> >
-| < NNNN: <DIGIT><DIGIT><DIGIT><DIGIT> >
-| < DATE_VALUE: <NNNN>"-"<NN>"-"<NN> >
-| < CHAR_STRING: <QUOTE>(<NON_QUOTE_CHARACTER>)*<QUOTE> >
+  < EXIT: "exit" >
+| < SEMICOLON: ";" >
+| < EOL: "\r"|"\n"|"\r\n" >
 }
 
-String Parse():
+TOKEN:
 {
-  Token t;
-  String result;
+  < CHAR_STRING: <QUOTE>(~["\'"])*<QUOTE> >
+| < INT_VALUE: (<SIGN>)?(<DIGIT>)+ >
+| < DIGIT: ["0"-"9"] >
+| < SIGN: ["+","-"] >
+| < DATE_VALUE: <NNNN>"-"<NN>"-"<NN> >
+| < NNNN: <DIGIT><DIGIT><DIGIT><DIGIT> >
+| < NN: <DIGIT><DIGIT> >
+| < QUOTE: ["\'"] >
+| < ALPHABET: ["a"-"z","A"-"Z"] >
+}
+
+boolean Parse():
+{
+  boolean exit;
 }
 {
-  { result = ""; }
   (
-    t = < CHAR_STRING >
-    { result += t.image; }
-  )*
+    Exit()
+    { exit = true; }
+  |
+    (
+      Query()
+    )+
+    { exit = false; }
+  )
+  < EOL >
+  { return exit; }
+}
+
+void Exit():
+{}
+{
+  < EXIT >
   < SEMICOLON >
-  { return result; }
+}
+
+void Query():
+{
+  Token t;
+}
+{
+  t = < INT_VALUE >
+  < SEMICOLON >
+  { print(t.image); }
 }

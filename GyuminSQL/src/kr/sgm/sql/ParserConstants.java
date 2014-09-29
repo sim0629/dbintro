@@ -11,27 +11,29 @@ public interface ParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int SEMICOLON = 5;
+  int EXIT = 3;
   /** RegularExpression Id. */
-  int QUOTE = 6;
+  int SEMICOLON = 4;
   /** RegularExpression Id. */
-  int NON_QUOTE_CHARACTER = 7;
+  int EOL = 5;
   /** RegularExpression Id. */
-  int ALPHABET = 8;
+  int CHAR_STRING = 6;
+  /** RegularExpression Id. */
+  int INT_VALUE = 7;
+  /** RegularExpression Id. */
+  int DIGIT = 8;
   /** RegularExpression Id. */
   int SIGN = 9;
   /** RegularExpression Id. */
-  int DIGIT = 10;
+  int DATE_VALUE = 10;
   /** RegularExpression Id. */
-  int INT_VALUE = 11;
+  int NNNN = 11;
   /** RegularExpression Id. */
   int NN = 12;
   /** RegularExpression Id. */
-  int NNNN = 13;
+  int QUOTE = 13;
   /** RegularExpression Id. */
-  int DATE_VALUE = 14;
-  /** RegularExpression Id. */
-  int CHAR_STRING = 15;
+  int ALPHABET = 14;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -41,19 +43,18 @@ public interface ParserConstants {
     "<EOF>",
     "\" \"",
     "\"\\t\"",
-    "\"\\r\"",
-    "\"\\n\"",
+    "\"exit\"",
     "\";\"",
-    "<QUOTE>",
-    "<NON_QUOTE_CHARACTER>",
-    "<ALPHABET>",
-    "<SIGN>",
-    "<DIGIT>",
-    "<INT_VALUE>",
-    "<NN>",
-    "<NNNN>",
-    "<DATE_VALUE>",
+    "<EOL>",
     "<CHAR_STRING>",
+    "<INT_VALUE>",
+    "<DIGIT>",
+    "<SIGN>",
+    "<DATE_VALUE>",
+    "<NNNN>",
+    "<NN>",
+    "<QUOTE>",
+    "<ALPHABET>",
   };
 
 }
