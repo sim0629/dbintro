@@ -106,9 +106,7 @@ boolean Parse():
     Exit()
     { exit = true; }
   |
-    (
-      Query()
-    )+
+    QueryList()
     { exit = false; }
   )
   < EOL >
@@ -122,12 +120,135 @@ void Exit():
   < SEMICOLON >
 }
 
-void Query():
+void QueryList():
+{}
 {
-  Token t;
+  (
+    Query()
+  )+
 }
+
+void Query():
+{}
 {
-  t = < INT_VALUE >
-  < SEMICOLON >
-  { print(t.image); }
+  CreateTable()
+| DropTable()
+| ShowTables()
+| Describe()
+}
+
+void CreateTable():
+{}
+{
+  < CREATE >
+  < TABLE >
+  < LEGAL_IDENTIFIER > // TABLE_NAME
+  TableElementList()
+  { print("\"create table\" requested"); }
+}
+
+void DropTable():
+{}
+{
+  < DROP >
+  < TABLE >
+  < LEGAL_IDENTIFIER > // TABLE_NAME
+  { print("\"drop table\" requested"); }
+}
+
+void ShowTables():
+{}
+{
+  < SHOW >
+  < TABLES >
+  { print("\"show tables\" requested"); }
+}
+
+void Describe():
+{}
+{
+  < DESC >
+  < LEGAL_IDENTIFIER > // TABLE_NAME
+  { print("\"desc\" requested"); }
+}
+
+void TableElementList():
+{}
+{
+  < LEFT_PAREN >
+  TableElement()
+  (
+    < COMMA >
+    TableElement()
+  )*
+  < RIGHT_PAREN >
+}
+
+void TableElement():
+{}
+{
+  ColumnDefinition()
+| TableConstraintDefinition()
+}
+
+void ColumnDefinition():
+{}
+{
+  < LEGAL_IDENTIFIER > // COLUMN_NAME
+  DataType()
+  (
+    < NOT >
+    < NULL >
+  )?
+}
+
+void TableConstraintDefinition():
+{}
+{
+  PrimaryKeyConstraint()
+| ReferentialConstraint()
+}
+
+void DataType():
+{}
+{
+  < INT >
+|
+  < CHAR >
+  < LEFT_PAREN >
+  < INT_VALUE >
+  < RIGHT_PAREN >
+|
+  < DATE >
+}
+
+void PrimaryKeyConstraint():
+{}
+{
+  < PRIMARY >
+  < KEY >
+  ColumnNameList()
+}
+
+void ReferentialConstraint():
+{}
+{
+  < FOREIGN >
+  < KEY >
+  ColumnNameList()
+  < REFERENCES >
+  < LEGAL_IDENTIFIER > // TABLE_NAME
+  ColumnNameList()
+}
+
+void ColumnNameList():
+{}
+{
+  < LEFT_PAREN >
+  < LEGAL_IDENTIFIER > // COLUMN_NAME
+  (
+    < COMMA >
+    < LEGAL_IDENTIFIER > // COLUMN_NAME
+  )
+  < RIGHT_PAREN >
 }
