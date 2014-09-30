@@ -135,6 +135,9 @@ void Query():
 | DropTable()
 | ShowTables()
 | Describe()
+| Select()
+| Insert()
+| Delete()
 }
 
 void CreateTable():
@@ -251,4 +254,240 @@ void ColumnNameList():
     < LEGAL_IDENTIFIER > // COLUMN_NAME
   )
   < RIGHT_PAREN >
+}
+
+void Select():
+{}
+{
+  < SELECT >
+  SelectList()
+  TableExpression()
+  { print("\"select\" requested"); }
+}
+
+void SelectList():
+{}
+{
+  < STAR >
+|
+  (
+    SelectedColumn()
+    (
+      < COMMA >
+      SelectedColumn()
+    )*
+  )
+}
+
+void SelectedColumn():
+{}
+{
+  (
+    < LEGAL_IDENTIFIER > // TABLE_NAME
+    < PERIOD >
+  )?
+  < LEGAL_IDENTIFIER > // COLUMN_NAME
+  (
+    < AS >
+    < LEGAL_IDENTIFIER > // COLUMN_NAME
+  )?
+}
+
+void TableExpression():
+{}
+{
+  FromClause()
+  (
+    WhereClause()
+  )?
+}
+
+void FromClause():
+{}
+{
+  < FROM >
+  TableReferenceList()
+}
+
+void TableReferenceList():
+{}
+{
+  ReferedTable()
+  (
+    < COMMA >
+    ReferedTable()
+  )*
+}
+
+void ReferedTable():
+{}
+{
+  < LEGAL_IDENTIFIER > // TABLE_NAME
+  (
+    < AS >
+    < LEGAL_IDENTIFIER > // TABLE_NAME
+  )?
+}
+
+void WhereClause():
+{}
+{
+  < WHERE >
+  BooleanValueExpression()
+}
+
+void BooleanValueExpression():
+{}
+{
+  BooleanTerm()
+|
+  (
+    BooleanTerm()
+    < OR >
+    BooleanValueExpression()
+  )
+}
+
+void BooleanTerm():
+{}
+{
+  BooleanFactor()
+|
+  (
+    BooleanFactor()
+    < OR >
+    BooleanTerm()
+  )
+}
+
+void BooleanFactor():
+{}
+{
+  (
+    < NOT >
+  )?
+  BooleanTest()
+}
+
+void BooleanTest():
+{}
+{
+  Predicate()
+|
+  ParenthesizedBooleanExpression()
+}
+
+void ParenthesizedBooleanExpression():
+{}
+{
+  < LEFT_PAREN >
+  BooleanValueExpression()
+  < RIGHT_PAREN >
+}
+
+void Predicate():
+{}
+{
+  ComparisonPredicate()
+| NullPredicate()
+}
+
+void ComparisonPredicate():
+{}
+{
+  CompOperand()
+  < COMP_OP >
+  CompOperand()
+}
+
+void CompOperand():
+{}
+{
+  ComparableValue()
+|
+  (
+    < LEGAL_IDENTIFIER > // TABLE_NAME
+    < PERIOD >
+  )?
+  < LEGAL_IDENTIFIER > // COLUMN_NAME
+}
+
+void ComparableValue():
+{}
+{
+  < INT_VALUE >
+| < CHAR_STRING >
+| < DATE_VALUE >
+}
+
+void NullPredicate():
+{}
+{
+  (
+    < LEGAL_IDENTIFIER > // TABLE_NAME
+    < PERIOD >
+  )?
+  < LEGAL_IDENTIFIER > // COLUMN_NAME
+  NullOperation()
+}
+
+void NullOperation():
+{}
+{
+  < IS >
+  (
+    < NOT >
+  )?
+  < NULL >
+}
+
+void Insert():
+{}
+{
+  < INSERT >
+  < INTO >
+  < LEGAL_IDENTIFIER > // TABLE_NAME
+  InsertColumnsAndSource()
+  { print("\"insert\" requested"); }
+}
+
+void InsertColumnsAndSource():
+{}
+{
+  (
+    ColumnNameList()
+  )?
+  ValueList()
+}
+
+void ValueList():
+{}
+{
+  < VALUES >
+  < LEFT_PAREN >
+  Value()
+  (
+    < COMMA >
+    Value()
+  )*
+  < RIGHT_PAREN >
+}
+
+void Value():
+{}
+{
+  < NULL >
+| ComparableValue()
+}
+
+void Delete():
+{}
+{
+  < DELETE >
+  < FROM >
+  < LEGAL_IDENTIFIER > // TABLE_NAME
+  (
+    WhereClause()
+  )?
+  { print("\"delete\" requested"); }
 }
