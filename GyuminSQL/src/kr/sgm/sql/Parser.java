@@ -10,17 +10,22 @@ public class Parser implements ParserConstants {
     while(true) {
       System.out.print(PROMPT);
       Parser parser = new Parser(System.in);
+      ArrayList<String> results = new ArrayList<String>();
       try {
-        if(parser.Parse()) break;
+        try {
+          if(parser.Parse(results)) break;
+        }finally{
+          for(String result : results)
+            System.out.printf("\u005c"%s\u005c" requested\u005cn", result);
+        }
       }catch(ParseException ex) {
         System.out.println("Syntax error");
       }
     }
   }
 
-  final public boolean Parse() throws ParseException {
+  final public boolean Parse(ArrayList<String> results) throws ParseException {
   boolean exit;
-  ArrayList<String> results = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case EXIT:
       jj_consume_token(EXIT);
@@ -33,7 +38,7 @@ public class Parser implements ParserConstants {
     case SELECT:
     case INSERT:
     case DELETE:
-      results = QueryList();
+      QueryList(results);
       exit = false;
       break;
     default:
@@ -42,16 +47,12 @@ public class Parser implements ParserConstants {
       throw new ParseException();
     }
     jj_consume_token(EOP);
-    if(results != null)
-      for(String result : results)
-        System.out.printf("\u005c"%s\u005c" requested\u005cn", result);
     {if (true) return exit;}
     throw new Error("Missing return statement in function");
   }
 
-  final public ArrayList<String> QueryList() throws ParseException {
+  final public void QueryList(ArrayList<String> results) throws ParseException {
   String result;
-  ArrayList<String> results = new ArrayList<String>();
     result = Query();
     results.add(result);
     label_1:
@@ -68,8 +69,6 @@ public class Parser implements ParserConstants {
       result = Query();
       results.add(result);
     }
-    {if (true) return results;}
-    throw new Error("Missing return statement in function");
   }
 
   final public String Query() throws ParseException {

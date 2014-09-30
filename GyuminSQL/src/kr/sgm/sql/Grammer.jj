@@ -15,8 +15,14 @@ public class Parser {
     while(true) {
       System.out.print(PROMPT);
       Parser parser = new Parser(System.in);
+      ArrayList<String> results = new ArrayList<String>();
       try {
-        if(parser.Parse()) break;
+        try {
+          if(parser.Parse(results)) break;
+        }finally{
+          for(String result : results)
+            System.out.printf("\"%s\" requested\n", result);
+        }
       }catch(ParseException ex) {
         System.out.println("Syntax error");
       }
@@ -96,32 +102,25 @@ TOKEN:
 | < ALPHABET: ["a"-"z","A"-"Z"] >
 }
 
-boolean Parse():
+boolean Parse(ArrayList<String> results):
 {
   boolean exit;
-  ArrayList<String> results = null;
 }
 {
   (
     < EXIT >
     { exit = true; }
   |
-    results = QueryList()
+    QueryList(results)
     { exit = false; }
   )
   < EOP >
-  {
-    if(results != null)
-      for(String result : results)
-        System.out.printf("\"%s\" requested\n", result);
-    return exit;
-  }
+  { return exit; }
 }
 
-ArrayList<String> QueryList():
+void QueryList(ArrayList<String> results):
 {
   String result;
-  ArrayList<String> results = new ArrayList<String>();
 }
 {
   result = Query()
@@ -131,7 +130,6 @@ ArrayList<String> QueryList():
     result = Query()
     { results.add(result); }
   )*
-  { return results; }
 }
 
 String Query():
