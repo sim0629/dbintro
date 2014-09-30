@@ -6,6 +6,8 @@ PARSER_BEGIN(Parser)
 
 package kr.sgm.sql;
 
+import java.util.ArrayList;
+
 public class Parser {
   private static String PROMPT = "SQL_2009-11744> ";
 
@@ -33,13 +35,15 @@ SKIP:
 {
   " "
 | "\t"
+| "\r"
+| "\n"
 }
 
 TOKEN:
 {
   < EXIT: "exit" >
+| < EOP: ";\r\n"|";\r"|";\n" >
 | < SEMICOLON: ";" >
-| < EOL: "\r"|"\n"|"\r\n" >
 }
 
 TOKEN:
@@ -100,44 +104,62 @@ TOKEN:
 boolean Parse():
 {
   boolean exit;
+  ArrayList<String> results = null;
 }
 {
   (
-    Exit()
+    < EXIT >
     { exit = true; }
   |
-    QueryList()
+    results = QueryList()
     { exit = false; }
   )
-  < EOL >
-  { return exit; }
+  < EOP >
+  {
+    for(String result : results)
+      print(String.format("\"%s\" requested", result));
+    return exit;
+  }
 }
 
-void Exit():
-{}
+ArrayList<String> QueryList():
 {
-  < EXIT >
-  < SEMICOLON >
+  String result;
+  ArrayList<String> results = new ArrayList<String>();
+}
+{
+  result = Query()
+  { results.add(result); }
+  (
+    < SEMICOLON >
+    result = Query()
+    { results.add(result); }
+  )*
+  { return results; }
 }
 
-void QueryList():
-{}
+String Query():
+{
+  String result;
+}
 {
   (
-    Query()
-  )+
-}
-
-void Query():
-{}
-{
-  CreateTable()
-| DropTable()
-| ShowTables()
-| Describe()
-| Select()
-| Insert()
-| Delete()
+    CreateTable()
+    { result = "create table"; }
+  | DropTable()
+    { result = "drop table"; }
+  | ShowTables()
+    { result = "show tables"; }
+  | Describe()
+    { result = "desc"; }
+  | Select()
+    { result = "select"; }
+  | Insert()
+    { result = "insert"; }
+  | Delete()
+    { result = "delete"; }
+  )
+  { return result; }
 }
 
 void CreateTable():
@@ -147,7 +169,6 @@ void CreateTable():
   < TABLE >
   < LEGAL_IDENTIFIER > // TABLE_NAME
   TableElementList()
-  { print("\"create table\" requested"); }
 }
 
 void DropTable():
@@ -156,7 +177,6 @@ void DropTable():
   < DROP >
   < TABLE >
   < LEGAL_IDENTIFIER > // TABLE_NAME
-  { print("\"drop table\" requested"); }
 }
 
 void ShowTables():
@@ -164,7 +184,6 @@ void ShowTables():
 {
   < SHOW >
   < TABLES >
-  { print("\"show tables\" requested"); }
 }
 
 void Describe():
@@ -172,7 +191,6 @@ void Describe():
 {
   < DESC >
   < LEGAL_IDENTIFIER > // TABLE_NAME
-  { print("\"desc\" requested"); }
 }
 
 void TableElementList():
@@ -262,7 +280,6 @@ void Select():
   < SELECT >
   SelectList()
   TableExpression()
-  { print("\"select\" requested"); }
 }
 
 void SelectList():
@@ -444,7 +461,6 @@ void Insert():
   < INTO >
   < LEGAL_IDENTIFIER > // TABLE_NAME
   InsertColumnsAndSource()
-  { print("\"insert\" requested"); }
 }
 
 void InsertColumnsAndSource():
@@ -485,5 +501,4 @@ void Delete():
   (
     WhereClause()
   )?
-  { print("\"delete\" requested"); }
 }
