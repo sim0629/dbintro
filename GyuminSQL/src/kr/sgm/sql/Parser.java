@@ -349,44 +349,36 @@ public class Parser implements ParserConstants {
   }
 
   final public void BooleanValueExpression() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case NOT:
-    case LEGAL_IDENTIFIER:
-    case LEFT_PAREN:
-    case CHAR_STRING:
-    case INT_VALUE:
-    case DATE_VALUE:
-      BooleanTerm();
-      break;
-      BooleanTerm();
+    BooleanTerm();
+    label_5:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case OR:
+        ;
+        break;
+      default:
+        jj_la1[15] = jj_gen;
+        break label_5;
+      }
       jj_consume_token(OR);
-      BooleanValueExpression();
-      break;
-    default:
-      jj_la1[15] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
+      BooleanTerm();
     }
   }
 
   final public void BooleanTerm() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case NOT:
-    case LEGAL_IDENTIFIER:
-    case LEFT_PAREN:
-    case CHAR_STRING:
-    case INT_VALUE:
-    case DATE_VALUE:
+    BooleanFactor();
+    label_6:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case AND:
+        ;
+        break;
+      default:
+        jj_la1[16] = jj_gen;
+        break label_6;
+      }
+      jj_consume_token(AND);
       BooleanFactor();
-      break;
-      BooleanFactor();
-      jj_consume_token(OR);
-      BooleanTerm();
-      break;
-    default:
-      jj_la1[16] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
     }
   }
 
@@ -429,12 +421,12 @@ public class Parser implements ParserConstants {
   final public void Predicate() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case LEGAL_IDENTIFIER:
+      NullPredicate();
+      break;
     case CHAR_STRING:
     case INT_VALUE:
     case DATE_VALUE:
       ComparisonPredicate();
-      break;
-      NullPredicate();
       break;
     default:
       jj_la1[19] = jj_gen;
@@ -544,7 +536,7 @@ public class Parser implements ParserConstants {
     jj_consume_token(VALUES);
     jj_consume_token(LEFT_PAREN);
     Value();
-    label_5:
+    label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMA:
@@ -552,7 +544,7 @@ public class Parser implements ParserConstants {
         break;
       default:
         jj_la1[26] = jj_gen;
-        break label_5;
+        break label_7;
       }
       jj_consume_token(COMMA);
       Value();
@@ -609,10 +601,10 @@ public class Parser implements ParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x90360048,0x90360040,0x90360040,0x0,0x1400,0x100,0x1400,0x1c000,0x0,0x0,0x0,0x400000,0x1000000,0x0,0x400000,0x100,0x100,0x100,0x0,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x0,0x200,0x1000000,};
+      jj_la1_0 = new int[] {0x90360048,0x90360040,0x90360040,0x0,0x1400,0x100,0x1400,0x1c000,0x0,0x0,0x0,0x400000,0x1000000,0x0,0x400000,0x2000000,0x4000000,0x100,0x0,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x0,0x200,0x1000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x10,0x1,0x0,0x0,0x0,0x10,0x21,0x1,0x0,0x0,0x10,0x0,0x1305,0x1305,0x0,0x1305,0x1301,0x1,0x1301,0x1300,0x1,0x0,0x4,0x10,0x1300,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x10,0x1,0x0,0x0,0x0,0x10,0x21,0x1,0x0,0x0,0x10,0x0,0x0,0x0,0x0,0x1305,0x1301,0x1,0x1301,0x1300,0x1,0x0,0x4,0x10,0x1300,0x0,};
    }
 
   /** Constructor with InputStream. */

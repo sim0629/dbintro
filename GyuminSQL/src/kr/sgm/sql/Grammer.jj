@@ -340,24 +340,20 @@ void BooleanValueExpression():
 {}
 {
   BooleanTerm()
-|
   (
-    BooleanTerm()
     < OR >
-    BooleanValueExpression()
-  )
+    BooleanTerm()
+  )*
 }
 
 void BooleanTerm():
 {}
 {
   BooleanFactor()
-|
   (
+    < AND >
     BooleanFactor()
-    < OR >
-    BooleanTerm()
-  )
+  )*
 }
 
 void BooleanFactor():
@@ -388,8 +384,8 @@ void ParenthesizedBooleanExpression():
 void Predicate():
 {}
 {
-  ComparisonPredicate()
-| NullPredicate()
+  NullPredicate()
+| ComparisonPredicate()
 }
 
 void ComparisonPredicate():
