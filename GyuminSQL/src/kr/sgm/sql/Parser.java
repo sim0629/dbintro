@@ -42,8 +42,9 @@ public class Parser implements ParserConstants {
       throw new ParseException();
     }
     jj_consume_token(EOP);
-    for(String result : results)
-      System.out.printf("\u005c"%s\u005c" requested\u005cn", result);
+    if(results != null)
+      for(String result : results)
+        System.out.printf("\u005c"%s\u005c" requested\u005cn", result);
     {if (true) return exit;}
     throw new Error("Missing return statement in function");
   }

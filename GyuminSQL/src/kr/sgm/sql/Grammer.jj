@@ -111,8 +111,9 @@ boolean Parse():
   )
   < EOP >
   {
-    for(String result : results)
-      System.out.printf("\"%s\" requested\n", result);
+    if(results != null)
+      for(String result : results)
+        System.out.printf("\"%s\" requested\n", result);
     return exit;
   }
 }
