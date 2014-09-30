@@ -28,23 +28,18 @@ public class Parser implements ParserConstants {
       Exit();
       exit = true;
       break;
-    case INT_VALUE:
-      label_1:
-      while (true) {
-        Query();
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case INT_VALUE:
-          ;
-          break;
-        default:
-          jj_la1[0] = jj_gen;
-          break label_1;
-        }
-      }
+    case CREATE:
+    case DROP:
+    case SHOW:
+    case DESC:
+    case SELECT:
+    case INSERT:
+    case DELETE:
+      QueryList();
       exit = false;
       break;
     default:
-      jj_la1[1] = jj_gen;
+      jj_la1[0] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -58,11 +53,543 @@ public class Parser implements ParserConstants {
     jj_consume_token(SEMICOLON);
   }
 
+  final public void QueryList() throws ParseException {
+    label_1:
+    while (true) {
+      Query();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case CREATE:
+      case DROP:
+      case SHOW:
+      case DESC:
+      case SELECT:
+      case INSERT:
+      case DELETE:
+        ;
+        break;
+      default:
+        jj_la1[1] = jj_gen;
+        break label_1;
+      }
+    }
+  }
+
   final public void Query() throws ParseException {
-  Token t;
-    t = jj_consume_token(INT_VALUE);
-    jj_consume_token(SEMICOLON);
-    print(t.image);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case CREATE:
+      CreateTable();
+      break;
+    case DROP:
+      DropTable();
+      break;
+    case SHOW:
+      ShowTables();
+      break;
+    case DESC:
+      Describe();
+      break;
+    case SELECT:
+      Select();
+      break;
+    case INSERT:
+      Insert();
+      break;
+    case DELETE:
+      Delete();
+      break;
+    default:
+      jj_la1[2] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void CreateTable() throws ParseException {
+    jj_consume_token(CREATE);
+    jj_consume_token(TABLE);
+    jj_consume_token(LEGAL_IDENTIFIER);
+    TableElementList();
+    print("\u005c"create table\u005c" requested");
+  }
+
+  final public void DropTable() throws ParseException {
+    jj_consume_token(DROP);
+    jj_consume_token(TABLE);
+    jj_consume_token(LEGAL_IDENTIFIER);
+    print("\u005c"drop table\u005c" requested");
+  }
+
+  final public void ShowTables() throws ParseException {
+    jj_consume_token(SHOW);
+    jj_consume_token(TABLES);
+    print("\u005c"show tables\u005c" requested");
+  }
+
+  final public void Describe() throws ParseException {
+    jj_consume_token(DESC);
+    jj_consume_token(LEGAL_IDENTIFIER);
+    print("\u005c"desc\u005c" requested");
+  }
+
+  final public void TableElementList() throws ParseException {
+    jj_consume_token(LEFT_PAREN);
+    TableElement();
+    label_2:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[3] = jj_gen;
+        break label_2;
+      }
+      jj_consume_token(COMMA);
+      TableElement();
+    }
+    jj_consume_token(RIGHT_PAREN);
+  }
+
+  final public void TableElement() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LEGAL_IDENTIFIER:
+      ColumnDefinition();
+      break;
+    case PRIMARY:
+    case FOREIGN:
+      TableConstraintDefinition();
+      break;
+    default:
+      jj_la1[4] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void ColumnDefinition() throws ParseException {
+    jj_consume_token(LEGAL_IDENTIFIER);
+    DataType();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NOT:
+      jj_consume_token(NOT);
+      jj_consume_token(NULL);
+      break;
+    default:
+      jj_la1[5] = jj_gen;
+      ;
+    }
+  }
+
+  final public void TableConstraintDefinition() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case PRIMARY:
+      PrimaryKeyConstraint();
+      break;
+    case FOREIGN:
+      ReferentialConstraint();
+      break;
+    default:
+      jj_la1[6] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void DataType() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case INT:
+      jj_consume_token(INT);
+      break;
+    case CHAR:
+      jj_consume_token(CHAR);
+      jj_consume_token(LEFT_PAREN);
+      jj_consume_token(INT_VALUE);
+      jj_consume_token(RIGHT_PAREN);
+      break;
+    case DATE:
+      jj_consume_token(DATE);
+      break;
+    default:
+      jj_la1[7] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void PrimaryKeyConstraint() throws ParseException {
+    jj_consume_token(PRIMARY);
+    jj_consume_token(KEY);
+    ColumnNameList();
+  }
+
+  final public void ReferentialConstraint() throws ParseException {
+    jj_consume_token(FOREIGN);
+    jj_consume_token(KEY);
+    ColumnNameList();
+    jj_consume_token(REFERENCES);
+    jj_consume_token(LEGAL_IDENTIFIER);
+    ColumnNameList();
+  }
+
+  final public void ColumnNameList() throws ParseException {
+    jj_consume_token(LEFT_PAREN);
+    jj_consume_token(LEGAL_IDENTIFIER);
+    jj_consume_token(COMMA);
+    jj_consume_token(LEGAL_IDENTIFIER);
+    jj_consume_token(RIGHT_PAREN);
+  }
+
+  final public void Select() throws ParseException {
+    jj_consume_token(SELECT);
+    SelectList();
+    TableExpression();
+    print("\u005c"select\u005c" requested");
+  }
+
+  final public void SelectList() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case STAR:
+      jj_consume_token(STAR);
+      break;
+    case LEGAL_IDENTIFIER:
+      SelectedColumn();
+      label_3:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case COMMA:
+          ;
+          break;
+        default:
+          jj_la1[8] = jj_gen;
+          break label_3;
+        }
+        jj_consume_token(COMMA);
+        SelectedColumn();
+      }
+      break;
+    default:
+      jj_la1[9] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void SelectedColumn() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LEGAL_IDENTIFIER:
+      jj_consume_token(LEGAL_IDENTIFIER);
+      jj_consume_token(PERIOD);
+      break;
+    default:
+      jj_la1[10] = jj_gen;
+      ;
+    }
+    jj_consume_token(LEGAL_IDENTIFIER);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case AS:
+      jj_consume_token(AS);
+      jj_consume_token(LEGAL_IDENTIFIER);
+      break;
+    default:
+      jj_la1[11] = jj_gen;
+      ;
+    }
+  }
+
+  final public void TableExpression() throws ParseException {
+    FromClause();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case WHERE:
+      WhereClause();
+      break;
+    default:
+      jj_la1[12] = jj_gen;
+      ;
+    }
+  }
+
+  final public void FromClause() throws ParseException {
+    jj_consume_token(FROM);
+    TableReferenceList();
+  }
+
+  final public void TableReferenceList() throws ParseException {
+    ReferedTable();
+    label_4:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[13] = jj_gen;
+        break label_4;
+      }
+      jj_consume_token(COMMA);
+      ReferedTable();
+    }
+  }
+
+  final public void ReferedTable() throws ParseException {
+    jj_consume_token(LEGAL_IDENTIFIER);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case AS:
+      jj_consume_token(AS);
+      jj_consume_token(LEGAL_IDENTIFIER);
+      break;
+    default:
+      jj_la1[14] = jj_gen;
+      ;
+    }
+  }
+
+  final public void WhereClause() throws ParseException {
+    jj_consume_token(WHERE);
+    BooleanValueExpression();
+  }
+
+  final public void BooleanValueExpression() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NOT:
+    case LEGAL_IDENTIFIER:
+    case LEFT_PAREN:
+    case CHAR_STRING:
+    case INT_VALUE:
+    case DATE_VALUE:
+      BooleanTerm();
+      break;
+      BooleanTerm();
+      jj_consume_token(OR);
+      BooleanValueExpression();
+      break;
+    default:
+      jj_la1[15] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void BooleanTerm() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NOT:
+    case LEGAL_IDENTIFIER:
+    case LEFT_PAREN:
+    case CHAR_STRING:
+    case INT_VALUE:
+    case DATE_VALUE:
+      BooleanFactor();
+      break;
+      BooleanFactor();
+      jj_consume_token(OR);
+      BooleanTerm();
+      break;
+    default:
+      jj_la1[16] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void BooleanFactor() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NOT:
+      jj_consume_token(NOT);
+      break;
+    default:
+      jj_la1[17] = jj_gen;
+      ;
+    }
+    BooleanTest();
+  }
+
+  final public void BooleanTest() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LEGAL_IDENTIFIER:
+    case CHAR_STRING:
+    case INT_VALUE:
+    case DATE_VALUE:
+      Predicate();
+      break;
+    case LEFT_PAREN:
+      ParenthesizedBooleanExpression();
+      break;
+    default:
+      jj_la1[18] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void ParenthesizedBooleanExpression() throws ParseException {
+    jj_consume_token(LEFT_PAREN);
+    BooleanValueExpression();
+    jj_consume_token(RIGHT_PAREN);
+  }
+
+  final public void Predicate() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LEGAL_IDENTIFIER:
+    case CHAR_STRING:
+    case INT_VALUE:
+    case DATE_VALUE:
+      ComparisonPredicate();
+      break;
+      NullPredicate();
+      break;
+    default:
+      jj_la1[19] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void ComparisonPredicate() throws ParseException {
+    CompOperand();
+    jj_consume_token(COMP_OP);
+    CompOperand();
+  }
+
+  final public void CompOperand() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case CHAR_STRING:
+    case INT_VALUE:
+    case DATE_VALUE:
+      ComparableValue();
+      break;
+    case LEGAL_IDENTIFIER:
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LEGAL_IDENTIFIER:
+        jj_consume_token(LEGAL_IDENTIFIER);
+        jj_consume_token(PERIOD);
+        break;
+      default:
+        jj_la1[20] = jj_gen;
+        ;
+      }
+      jj_consume_token(LEGAL_IDENTIFIER);
+      break;
+    default:
+      jj_la1[21] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void ComparableValue() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case INT_VALUE:
+      jj_consume_token(INT_VALUE);
+      break;
+    case CHAR_STRING:
+      jj_consume_token(CHAR_STRING);
+      break;
+    case DATE_VALUE:
+      jj_consume_token(DATE_VALUE);
+      break;
+    default:
+      jj_la1[22] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void NullPredicate() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LEGAL_IDENTIFIER:
+      jj_consume_token(LEGAL_IDENTIFIER);
+      jj_consume_token(PERIOD);
+      break;
+    default:
+      jj_la1[23] = jj_gen;
+      ;
+    }
+    jj_consume_token(LEGAL_IDENTIFIER);
+    NullOperation();
+  }
+
+  final public void NullOperation() throws ParseException {
+    jj_consume_token(IS);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NOT:
+      jj_consume_token(NOT);
+      break;
+    default:
+      jj_la1[24] = jj_gen;
+      ;
+    }
+    jj_consume_token(NULL);
+  }
+
+  final public void Insert() throws ParseException {
+    jj_consume_token(INSERT);
+    jj_consume_token(INTO);
+    jj_consume_token(LEGAL_IDENTIFIER);
+    InsertColumnsAndSource();
+    print("\u005c"insert\u005c" requested");
+  }
+
+  final public void InsertColumnsAndSource() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LEFT_PAREN:
+      ColumnNameList();
+      break;
+    default:
+      jj_la1[25] = jj_gen;
+      ;
+    }
+    ValueList();
+  }
+
+  final public void ValueList() throws ParseException {
+    jj_consume_token(VALUES);
+    jj_consume_token(LEFT_PAREN);
+    Value();
+    label_5:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[26] = jj_gen;
+        break label_5;
+      }
+      jj_consume_token(COMMA);
+      Value();
+    }
+    jj_consume_token(RIGHT_PAREN);
+  }
+
+  final public void Value() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NULL:
+      jj_consume_token(NULL);
+      break;
+    case CHAR_STRING:
+    case INT_VALUE:
+    case DATE_VALUE:
+      ComparableValue();
+      break;
+    default:
+      jj_la1[27] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void Delete() throws ParseException {
+    jj_consume_token(DELETE);
+    jj_consume_token(FROM);
+    jj_consume_token(LEGAL_IDENTIFIER);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case WHERE:
+      WhereClause();
+      break;
+    default:
+      jj_la1[28] = jj_gen;
+      ;
+    }
+    print("\u005c"delete\u005c" requested");
   }
 
   /** Generated Token Manager. */
@@ -74,13 +601,18 @@ public class Parser implements ParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[2];
+  final private int[] jj_la1 = new int[29];
   static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
   static {
       jj_la1_init_0();
+      jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x80,0x88,};
+      jj_la1_0 = new int[] {0x90360048,0x90360040,0x90360040,0x0,0x1400,0x100,0x1400,0x1c000,0x0,0x0,0x0,0x400000,0x1000000,0x0,0x400000,0x100,0x100,0x100,0x0,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x0,0x200,0x1000000,};
+   }
+   private static void jj_la1_init_1() {
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x10,0x1,0x0,0x0,0x0,0x10,0x21,0x1,0x0,0x0,0x10,0x0,0x1305,0x1305,0x0,0x1305,0x1301,0x1,0x1301,0x1300,0x1,0x0,0x4,0x10,0x1300,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -94,7 +626,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -108,7 +640,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -118,7 +650,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -128,7 +660,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -137,7 +669,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -146,7 +678,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -197,21 +729,24 @@ public class Parser implements ParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[15];
+    boolean[] la1tokens = new boolean[49];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 29; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
+          if ((jj_la1_1[i] & (1<<j)) != 0) {
+            la1tokens[32+j] = true;
+          }
         }
       }
     }
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 49; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
