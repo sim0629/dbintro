@@ -6,19 +6,14 @@ import java.util.ArrayList;
 public class Parser implements ParserConstants {
   private static String PROMPT = "SQL_2009-11744> ";
 
-  private static void print(String message) {
-    System.out.print(PROMPT);
-    System.out.println(message);
-  }
-
   public static void main(String[] args) {
     while(true) {
-      print("");
+      System.out.print(PROMPT);
       Parser parser = new Parser(System.in);
       try {
         if(parser.Parse()) break;
       }catch(ParseException ex) {
-        print("Syntax error");
+        System.out.println("Syntax error");
       }
     }
   }
@@ -48,7 +43,7 @@ public class Parser implements ParserConstants {
     }
     jj_consume_token(EOP);
     for(String result : results)
-      print(String.format("\u005c"%s\u005c" requested", result));
+      System.out.printf("\u005c"%s\u005c" requested\u005cn", result);
     {if (true) return exit;}
     throw new Error("Missing return statement in function");
   }

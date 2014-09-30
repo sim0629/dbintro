@@ -11,19 +11,14 @@ import java.util.ArrayList;
 public class Parser {
   private static String PROMPT = "SQL_2009-11744> ";
 
-  private static void print(String message) {
-    System.out.print(PROMPT);
-    System.out.println(message);
-  }
-
   public static void main(String[] args) {
     while(true) {
-      print("");
+      System.out.print(PROMPT);
       Parser parser = new Parser(System.in);
       try {
         if(parser.Parse()) break;
       }catch(ParseException ex) {
-        print("Syntax error");
+        System.out.println("Syntax error");
       }
     }
   }
@@ -117,7 +112,7 @@ boolean Parse():
   < EOP >
   {
     for(String result : results)
-      print(String.format("\"%s\" requested", result));
+      System.out.printf("\"%s\" requested\n", result);
     return exit;
   }
 }
