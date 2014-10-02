@@ -294,6 +294,7 @@ void SelectedColumn():
 {}
 {
   (
+    LOOKAHEAD(2)
     < LEGAL_IDENTIFIER > // TABLE_NAME
     < PERIOD >
   )?
@@ -395,6 +396,7 @@ void ParenthesizedBooleanExpression():
 void Predicate():
 {}
 {
+  LOOKAHEAD(3)
   NullPredicate()
 | ComparisonPredicate()
 }
@@ -413,6 +415,7 @@ void CompOperand():
   ComparableValue()
 |
   (
+    LOOKAHEAD(2)
     < LEGAL_IDENTIFIER > // TABLE_NAME
     < PERIOD >
   )?
@@ -431,6 +434,7 @@ void NullPredicate():
 {}
 {
   (
+    LOOKAHEAD(2)
     < LEGAL_IDENTIFIER > // TABLE_NAME
     < PERIOD >
   )?
