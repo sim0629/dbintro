@@ -11,11 +11,11 @@ public interface ParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int EXIT = 5;
+  int EOP = 5;
   /** RegularExpression Id. */
-  int EOP = 6;
+  int SEMICOLON = 6;
   /** RegularExpression Id. */
-  int SEMICOLON = 7;
+  int EXIT = 7;
   /** RegularExpression Id. */
   int CREATE = 8;
   /** RegularExpression Id. */
@@ -113,9 +113,9 @@ public interface ParserConstants {
     "\"\\t\"",
     "\"\\r\"",
     "\"\\n\"",
-    "\"exit\"",
     "<EOP>",
     "\";\"",
+    "\"exit\"",
     "\"create\"",
     "\"table\"",
     "\"not\"",

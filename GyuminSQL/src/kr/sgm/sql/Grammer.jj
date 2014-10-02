@@ -42,14 +42,14 @@ SKIP:
 
 TOKEN:
 {
-  < EXIT: "exit" >
-| < EOP: ";\r\n"|";\r"|";\n" >
+  < EOP: ";\r\n"|";\r"|";\n" >
 | < SEMICOLON: ";" >
 }
 
-TOKEN:
+TOKEN[IGNORE_CASE]:
 {
-  < CREATE: "create" >
+  < EXIT: "exit" >
+| < CREATE: "create" >
 | < TABLE: "table" >
 | < NOT: "not" >
 | < NULL: "null" >
