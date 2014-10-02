@@ -264,7 +264,7 @@ void ColumnNameList():
   (
     < COMMA >
     < LEGAL_IDENTIFIER > // COLUMN_NAME
-  )
+  )*
   < RIGHT_PAREN >
 }
 
