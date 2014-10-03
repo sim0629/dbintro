@@ -7,9 +7,47 @@ PARSER_BEGIN(Parser)
 package kr.sgm.sql;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Parser {
   private static String PROMPT = "SQL_2009-11744> ";
+
+  private static ArrayList<String> Keywords =
+    new ArrayList<String>(
+      Arrays.asList(
+        "exit",
+        "create",
+        "table",
+        "not",
+        "null",
+        "primary",
+        "key",
+        "foreign",
+        "references",
+        "int",
+        "char",
+        "date",
+        "drop",
+        "show",
+        "tables",
+        "desc",
+        "select",
+        "as",
+        "from",
+        "where",
+        "or",
+        "and",
+        "is",
+        "insert",
+        "into",
+        "values",
+        "delete"
+      )
+    );
+
+  private static boolean isKeyword(String identifier) {
+    return Keywords.contains(identifier.toLowerCase());
+  }
 
   public static void main(String[] args) {
     while(true) {
@@ -46,7 +84,7 @@ TOKEN:
 | < SEMICOLON: ";" >
 }
 
-TOKEN[IGNORE_CASE]:
+TOKEN:
 {
   < EXIT: "exit" >
 | < CREATE: "create" >
@@ -161,7 +199,7 @@ void CreateTable():
 {
   < CREATE >
   < TABLE >
-  < LEGAL_IDENTIFIER > // TABLE_NAME
+  LegalIdentifier() // TABLE_NAME
   TableElementList()
 }
 
@@ -170,7 +208,7 @@ void DropTable():
 {
   < DROP >
   < TABLE >
-  < LEGAL_IDENTIFIER > // TABLE_NAME
+  LegalIdentifier() // TABLE_NAME
 }
 
 void ShowTables():
@@ -184,7 +222,7 @@ void Describe():
 {}
 {
   < DESC >
-  < LEGAL_IDENTIFIER > // TABLE_NAME
+  LegalIdentifier() // TABLE_NAME
 }
 
 void TableElementList():
@@ -209,7 +247,7 @@ void TableElement():
 void ColumnDefinition():
 {}
 {
-  < LEGAL_IDENTIFIER > // COLUMN_NAME
+  LegalIdentifier() // COLUMN_NAME
   DataType()
   (
     < NOT >
@@ -252,7 +290,7 @@ void ReferentialConstraint():
   < KEY >
   ColumnNameList()
   < REFERENCES >
-  < LEGAL_IDENTIFIER > // TABLE_NAME
+  LegalIdentifier() // TABLE_NAME
   ColumnNameList()
 }
 
@@ -260,10 +298,10 @@ void ColumnNameList():
 {}
 {
   < LEFT_PAREN >
-  < LEGAL_IDENTIFIER > // COLUMN_NAME
+  LegalIdentifier() // COLUMN_NAME
   (
     < COMMA >
-    < LEGAL_IDENTIFIER > // COLUMN_NAME
+    LegalIdentifier() // COLUMN_NAME
   )*
   < RIGHT_PAREN >
 }
@@ -295,13 +333,13 @@ void SelectedColumn():
 {
   (
     LOOKAHEAD(2)
-    < LEGAL_IDENTIFIER > // TABLE_NAME
+    LegalIdentifier() // TABLE_NAME
     < PERIOD >
   )?
-  < LEGAL_IDENTIFIER > // COLUMN_NAME
+  LegalIdentifier() // COLUMN_NAME
   (
     < AS >
-    < LEGAL_IDENTIFIER > // COLUMN_NAME
+    LegalIdentifier() // COLUMN_NAME
   )?
 }
 
@@ -334,10 +372,10 @@ void TableReferenceList():
 void ReferedTable():
 {}
 {
-  < LEGAL_IDENTIFIER > // TABLE_NAME
+  LegalIdentifier() // TABLE_NAME
   (
     < AS >
-    < LEGAL_IDENTIFIER > // TABLE_NAME
+    LegalIdentifier() // TABLE_NAME
   )?
 }
 
@@ -416,10 +454,10 @@ void CompOperand():
 |
   (
     LOOKAHEAD(2)
-    < LEGAL_IDENTIFIER > // TABLE_NAME
+    LegalIdentifier() // TABLE_NAME
     < PERIOD >
   )?
-  < LEGAL_IDENTIFIER > // COLUMN_NAME
+  LegalIdentifier() // COLUMN_NAME
 }
 
 void ComparableValue():
@@ -435,10 +473,10 @@ void NullPredicate():
 {
   (
     LOOKAHEAD(2)
-    < LEGAL_IDENTIFIER > // TABLE_NAME
+    LegalIdentifier() // TABLE_NAME
     < PERIOD >
   )?
-  < LEGAL_IDENTIFIER > // COLUMN_NAME
+  LegalIdentifier() // COLUMN_NAME
   NullOperation()
 }
 
@@ -457,7 +495,7 @@ void Insert():
 {
   < INSERT >
   < INTO >
-  < LEGAL_IDENTIFIER > // TABLE_NAME
+  LegalIdentifier() // TABLE_NAME
   InsertColumnsAndSource()
 }
 
@@ -495,8 +533,20 @@ void Delete():
 {
   < DELETE >
   < FROM >
-  < LEGAL_IDENTIFIER > // TABLE_NAME
+  LegalIdentifier() // TABLE_NAME
   (
     WhereClause()
   )?
+}
+
+void LegalIdentifier():
+{
+  Token t;
+}
+{
+  t = < LEGAL_IDENTIFIER >
+  {
+    if(isKeyword(t.image))
+      throw new ParseException();
+  }
 }

@@ -2,9 +2,47 @@
 package kr.sgm.sql;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Parser implements ParserConstants {
   private static String PROMPT = "SQL_2009-11744> ";
+
+  private static ArrayList<String> Keywords =
+    new ArrayList<String>(
+      Arrays.asList(
+        "exit",
+        "create",
+        "table",
+        "not",
+        "null",
+        "primary",
+        "key",
+        "foreign",
+        "references",
+        "int",
+        "char",
+        "date",
+        "drop",
+        "show",
+        "tables",
+        "desc",
+        "select",
+        "as",
+        "from",
+        "where",
+        "or",
+        "and",
+        "is",
+        "insert",
+        "into",
+        "values",
+        "delete"
+      )
+    );
+
+  private static boolean isKeyword(String identifier) {
+    return Keywords.contains(identifier.toLowerCase());
+  }
 
   public static void main(String[] args) {
     while(true) {
@@ -114,14 +152,14 @@ public class Parser implements ParserConstants {
   final public void CreateTable() throws ParseException {
     jj_consume_token(CREATE);
     jj_consume_token(TABLE);
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
     TableElementList();
   }
 
   final public void DropTable() throws ParseException {
     jj_consume_token(DROP);
     jj_consume_token(TABLE);
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
   }
 
   final public void ShowTables() throws ParseException {
@@ -131,7 +169,7 @@ public class Parser implements ParserConstants {
 
   final public void Describe() throws ParseException {
     jj_consume_token(DESC);
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
   }
 
   final public void TableElementList() throws ParseException {
@@ -170,7 +208,7 @@ public class Parser implements ParserConstants {
   }
 
   final public void ColumnDefinition() throws ParseException {
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
     DataType();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NOT:
@@ -230,13 +268,13 @@ public class Parser implements ParserConstants {
     jj_consume_token(KEY);
     ColumnNameList();
     jj_consume_token(REFERENCES);
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
     ColumnNameList();
   }
 
   final public void ColumnNameList() throws ParseException {
     jj_consume_token(LEFT_PAREN);
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -248,7 +286,7 @@ public class Parser implements ParserConstants {
         break label_3;
       }
       jj_consume_token(COMMA);
-      jj_consume_token(LEGAL_IDENTIFIER);
+      LegalIdentifier();
     }
     jj_consume_token(RIGHT_PAREN);
   }
@@ -289,16 +327,16 @@ public class Parser implements ParserConstants {
 
   final public void SelectedColumn() throws ParseException {
     if (jj_2_1(2)) {
-      jj_consume_token(LEGAL_IDENTIFIER);
+      LegalIdentifier();
       jj_consume_token(PERIOD);
     } else {
       ;
     }
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case AS:
       jj_consume_token(AS);
-      jj_consume_token(LEGAL_IDENTIFIER);
+      LegalIdentifier();
       break;
     default:
       jj_la1[11] = jj_gen;
@@ -341,11 +379,11 @@ public class Parser implements ParserConstants {
   }
 
   final public void ReferedTable() throws ParseException {
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case AS:
       jj_consume_token(AS);
-      jj_consume_token(LEGAL_IDENTIFIER);
+      LegalIdentifier();
       break;
     default:
       jj_la1[14] = jj_gen;
@@ -462,12 +500,12 @@ public class Parser implements ParserConstants {
       break;
     case LEGAL_IDENTIFIER:
       if (jj_2_3(2)) {
-        jj_consume_token(LEGAL_IDENTIFIER);
+        LegalIdentifier();
         jj_consume_token(PERIOD);
       } else {
         ;
       }
-      jj_consume_token(LEGAL_IDENTIFIER);
+      LegalIdentifier();
       break;
     default:
       jj_la1[20] = jj_gen;
@@ -496,12 +534,12 @@ public class Parser implements ParserConstants {
 
   final public void NullPredicate() throws ParseException {
     if (jj_2_4(2)) {
-      jj_consume_token(LEGAL_IDENTIFIER);
+      LegalIdentifier();
       jj_consume_token(PERIOD);
     } else {
       ;
     }
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
     NullOperation();
   }
 
@@ -521,7 +559,7 @@ public class Parser implements ParserConstants {
   final public void Insert() throws ParseException {
     jj_consume_token(INSERT);
     jj_consume_token(INTO);
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
     InsertColumnsAndSource();
   }
 
@@ -577,7 +615,7 @@ public class Parser implements ParserConstants {
   final public void Delete() throws ParseException {
     jj_consume_token(DELETE);
     jj_consume_token(FROM);
-    jj_consume_token(LEGAL_IDENTIFIER);
+    LegalIdentifier();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case WHERE:
       WhereClause();
@@ -586,6 +624,13 @@ public class Parser implements ParserConstants {
       jj_la1[26] = jj_gen;
       ;
     }
+  }
+
+  final public void LegalIdentifier() throws ParseException {
+  Token t;
+    t = jj_consume_token(LEGAL_IDENTIFIER);
+    if(isKeyword(t.image))
+      {if (true) throw new ParseException();}
   }
 
   private boolean jj_2_1(int xla) {
@@ -616,44 +661,49 @@ public class Parser implements ParserConstants {
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3R_9() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_4()) jj_scanpos = xsp;
-    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
-    if (jj_3R_10()) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_9()) return true;
-    return false;
-  }
-
   private boolean jj_3_3() {
-    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
+    if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 
   private boolean jj_3_1() {
-    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
+    if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 
   private boolean jj_3_4() {
-    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
+    if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 
-  private boolean jj_3R_10() {
+  private boolean jj_3R_11() {
     if (jj_scan_token(IS)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_scan_token(10)) jj_scanpos = xsp;
     if (jj_scan_token(NULL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_10() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_4()) jj_scanpos = xsp;
+    if (jj_3R_9()) return true;
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_9() {
+    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_10()) return true;
     return false;
   }
 
