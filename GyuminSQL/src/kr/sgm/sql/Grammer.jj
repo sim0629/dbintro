@@ -434,7 +434,7 @@ void ParenthesizedBooleanExpression():
 void Predicate():
 {}
 {
-  LOOKAHEAD(3)
+  LOOKAHEAD(4)
   NullPredicate()
 | ComparisonPredicate()
 }
