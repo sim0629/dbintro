@@ -68,7 +68,7 @@ public class Parser {
           // ParseException이 발생하는 경우에도
           // 그 직전까지의 결과를 알기 위함이다.
           if(parser.Parse(results)) break;
-        }finally{
+        }finally {
           // Parse가 Exception을 발생하든 안하든 실행되는 block이다.
           for(String result : results)
             System.out.printf("\"%s\" requested\n", result);

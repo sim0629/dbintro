@@ -63,7 +63,7 @@ public class Parser implements ParserConstants {
           // ParseException이 발생하는 경우에도
           // 그 직전까지의 결과를 알기 위함이다.
           if(parser.Parse(results)) break;
-        }finally{
+        }finally {
           // Parse가 Exception을 발생하든 안하든 실행되는 block이다.
           for(String result : results)
             System.out.printf("\u005c"%s\u005c" requested\u005cn", result);
