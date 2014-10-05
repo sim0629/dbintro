@@ -12,6 +12,9 @@ import java.util.Arrays;
 public class Parser {
   private static String PROMPT = "SQL_2009-11744> ";
 
+  // 키워드 목록
+  //  식별자에 포함되지 않는지 확인하기 위해 사용된다.
+  //  아래의 Keywords 토큰과 같은 집합을 유지해야한다.
   private static ArrayList<String> Keywords =
     new ArrayList<String>(
       Arrays.asList(
@@ -45,6 +48,8 @@ public class Parser {
       )
     );
 
+  // 식별자가 키워드 목록에 포함되는지 검사한다.
+  // 대소문자 구분없이 비교한다.
   private static boolean isKeyword(String identifier) {
     return Keywords.contains(identifier.toLowerCase());
   }
@@ -53,11 +58,18 @@ public class Parser {
     while(true) {
       System.out.print(PROMPT);
       Parser parser = new Parser(System.in);
+      // 파싱 결과를 저장할 리스트.
       ArrayList<String> results = new ArrayList<String>();
       try {
         try {
+          // Parse는 종료할지를 boolean 값으로 리턴한다.
+          // 파싱 결과를 리턴값으로 받지 않고
+          // 결과를 담을 리스트를 인자로 넘기는 이유는
+          // ParseException이 발생하는 경우에도
+          // 그 직전까지의 결과를 알기 위함이다.
           if(parser.Parse(results)) break;
         }finally{
+          // Parse가 Exception을 발생하든 안하든 실행되는 block이다.
           for(String result : results)
             System.out.printf("\"%s\" requested\n", result);
         }
@@ -84,6 +96,9 @@ TOKEN:
 | < SEMICOLON: ";" >
 }
 
+// Keywords
+//  여기 사용된 토큰 스트링 집합은 Parser.Keywords와
+//  같은 집합을 유지해야한다.
 TOKEN:
 {
   < EXIT: "exit" >
@@ -332,6 +347,7 @@ void SelectedColumn():
 {}
 {
   (
+    // < PERIOD >가 있는지 확인하기 위해 토큰 두개를 미리본다.
     LOOKAHEAD(2)
     LegalIdentifier() // TABLE_NAME
     < PERIOD >
@@ -434,6 +450,7 @@ void ParenthesizedBooleanExpression():
 void Predicate():
 {}
 {
+  // < IS >가 있는지 확인하기 위해 토큰 네개를 미리본다.
   LOOKAHEAD(4)
   NullPredicate()
 | ComparisonPredicate()
@@ -453,6 +470,7 @@ void CompOperand():
   ComparableValue()
 |
   (
+    // < PERIOD >가 있는지 확인하기 위해 토큰 두개를 미리본다.
     LOOKAHEAD(2)
     LegalIdentifier() // TABLE_NAME
     < PERIOD >
@@ -472,6 +490,7 @@ void NullPredicate():
 {}
 {
   (
+    // < PERIOD >가 있는지 확인하기 위해 토큰 두개를 미리본다.
     LOOKAHEAD(2)
     LegalIdentifier() // TABLE_NAME
     < PERIOD >
@@ -546,6 +565,10 @@ void LegalIdentifier():
 {
   t = < LEGAL_IDENTIFIER >
   {
+    // 식별자가 키워드일 경우 예외를 발생한다.
+    // 키워드 토큰은 대소문자 구분을 해서 소문자만 되지만
+    // 식별자는 대소문자 구분을 하지 않으므로
+    // 이러한 예외처리가 필요하다.
     if(isKeyword(t.image))
       throw new ParseException();
   }

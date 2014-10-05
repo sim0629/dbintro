@@ -7,6 +7,9 @@ import java.util.Arrays;
 public class Parser implements ParserConstants {
   private static String PROMPT = "SQL_2009-11744> ";
 
+  // 키워드 목록
+  //  식별자에 포함되지 않는지 확인하기 위해 사용된다.
+  //  아래의 Keywords 토큰과 같은 집합을 유지해야한다.
   private static ArrayList<String> Keywords =
     new ArrayList<String>(
       Arrays.asList(
@@ -40,6 +43,8 @@ public class Parser implements ParserConstants {
       )
     );
 
+  // 식별자가 키워드 목록에 포함되는지 검사한다.
+  // 대소문자 구분없이 비교한다.
   private static boolean isKeyword(String identifier) {
     return Keywords.contains(identifier.toLowerCase());
   }
@@ -48,11 +53,18 @@ public class Parser implements ParserConstants {
     while(true) {
       System.out.print(PROMPT);
       Parser parser = new Parser(System.in);
+      // 파싱 결과를 저장할 리스트.
       ArrayList<String> results = new ArrayList<String>();
       try {
         try {
+          // Parse는 종료할지를 boolean 값으로 리턴한다.
+          // 파싱 결과를 리턴값으로 받지 않고
+          // 결과를 담을 리스트를 인자로 넘기는 이유는
+          // ParseException이 발생하는 경우에도
+          // 그 직전까지의 결과를 알기 위함이다.
           if(parser.Parse(results)) break;
         }finally{
+          // Parse가 Exception을 발생하든 안하든 실행되는 block이다.
           for(String result : results)
             System.out.printf("\u005c"%s\u005c" requested\u005cn", result);
         }
@@ -467,7 +479,7 @@ public class Parser implements ParserConstants {
   }
 
   final public void Predicate() throws ParseException {
-    if (jj_2_2(3)) {
+    if (jj_2_2(4)) {
       NullPredicate();
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -629,6 +641,10 @@ public class Parser implements ParserConstants {
   final public void LegalIdentifier() throws ParseException {
   Token t;
     t = jj_consume_token(LEGAL_IDENTIFIER);
+    // 식별자가 키워드일 경우 예외를 발생한다.
+    // 키워드 토큰은 대소문자 구분을 해서 소문자만 되지만
+    // 식별자는 대소문자 구분을 하지 않으므로
+    // 이러한 예외처리가 필요하다.
     if(isKeyword(t.image))
       {if (true) throw new ParseException();}
   }
@@ -661,19 +677,29 @@ public class Parser implements ParserConstants {
     finally { jj_save(3, xla); }
   }
 
+  private boolean jj_3R_9() {
+    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
+    return false;
+  }
+
   private boolean jj_3_3() {
     if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 
-  private boolean jj_3_1() {
+  private boolean jj_3_2() {
+    if (jj_3R_10()) return true;
+    return false;
+  }
+
+  private boolean jj_3_4() {
     if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 
-  private boolean jj_3_4() {
+  private boolean jj_3_1() {
     if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
     return false;
@@ -694,16 +720,6 @@ public class Parser implements ParserConstants {
     if (jj_3_4()) jj_scanpos = xsp;
     if (jj_3R_9()) return true;
     if (jj_3R_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_9() {
-    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_10()) return true;
     return false;
   }
 
