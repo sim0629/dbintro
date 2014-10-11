@@ -611,15 +611,18 @@ public class Parser implements ParserConstants {
     }
   }
 
-  final public void LegalIdentifier() throws ParseException {
+  final public String LegalIdentifier() throws ParseException {
   Token t;
     t = jj_consume_token(LEGAL_IDENTIFIER);
+    String identifier = t.image;
     // 식별자가 키워드일 경우 예외를 발생한다.
     // 키워드 토큰은 대소문자 구분을 해서 소문자만 되지만
     // 식별자는 대소문자 구분을 하지 않으므로
     // 이러한 예외처리가 필요하다.
-    if(isKeyword(t.image))
+    if(isKeyword(identifier))
       {if (true) throw new ParseException();}
+    {if (true) return identifier;}
+    throw new Error("Missing return statement in function");
   }
 
   private boolean jj_2_1(int xla) {
