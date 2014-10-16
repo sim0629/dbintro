@@ -47,7 +47,7 @@ public class Parser implements ParserConstants {
     return Keywords.contains(identifier.toLowerCase());
   }
 
-  final public boolean Parse(ArrayList<String> results) throws ParseException {
+  final public boolean Parse(ArrayList<BaseQuery> results) throws ParseException {
   boolean exit;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case EXIT:
@@ -74,8 +74,8 @@ public class Parser implements ParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public void QueryList(ArrayList<String> results) throws ParseException {
-  String result;
+  final public void QueryList(ArrayList<BaseQuery> results) throws ParseException {
+  BaseQuery result;
     result = Query();
     results.add(result);
     label_1:
@@ -94,36 +94,29 @@ public class Parser implements ParserConstants {
     }
   }
 
-  final public String Query() throws ParseException {
-  String result;
+  final public BaseQuery Query() throws ParseException {
+  BaseQuery result;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case CREATE:
-      CreateTable();
-      result = "create table";
+      result = CreateTable();
       break;
     case DROP:
-      DropTable();
-      result = "drop table";
+      result = DropTable();
       break;
     case SHOW:
-      ShowTables();
-      result = "show tables";
+      result = ShowTables();
       break;
     case DESC:
-      Describe();
-      result = "desc";
+      result = Describe();
       break;
     case SELECT:
-      Select();
-      result = "select";
+      result = Select();
       break;
     case INSERT:
-      Insert();
-      result = "insert";
+      result = Insert();
       break;
     case DELETE:
-      Delete();
-      result = "delete";
+      result = Delete();
       break;
     default:
       jj_la1[2] = jj_gen;
@@ -134,27 +127,35 @@ public class Parser implements ParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public void CreateTable() throws ParseException {
+  final public CreateTableQuery CreateTable() throws ParseException {
     jj_consume_token(CREATE);
     jj_consume_token(TABLE);
     LegalIdentifier();
     TableElementList();
+    {if (true) return new CreateTableQuery();}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void DropTable() throws ParseException {
+  final public DropTableQuery DropTable() throws ParseException {
     jj_consume_token(DROP);
     jj_consume_token(TABLE);
     LegalIdentifier();
+    {if (true) return new DropTableQuery();}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void ShowTables() throws ParseException {
+  final public ShowTablesQuery ShowTables() throws ParseException {
     jj_consume_token(SHOW);
     jj_consume_token(TABLES);
+    {if (true) return new ShowTablesQuery();}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void Describe() throws ParseException {
+  final public DescribeQuery Describe() throws ParseException {
     jj_consume_token(DESC);
     LegalIdentifier();
+    {if (true) return new DescribeQuery();}
+    throw new Error("Missing return statement in function");
   }
 
   final public void TableElementList() throws ParseException {
@@ -276,10 +277,12 @@ public class Parser implements ParserConstants {
     jj_consume_token(RIGHT_PAREN);
   }
 
-  final public void Select() throws ParseException {
+  final public SelectQuery Select() throws ParseException {
     jj_consume_token(SELECT);
     SelectList();
     TableExpression();
+    {if (true) return new SelectQuery();}
+    throw new Error("Missing return statement in function");
   }
 
   final public void SelectList() throws ParseException {
@@ -541,11 +544,13 @@ public class Parser implements ParserConstants {
     jj_consume_token(NULL);
   }
 
-  final public void Insert() throws ParseException {
+  final public InsertQuery Insert() throws ParseException {
     jj_consume_token(INSERT);
     jj_consume_token(INTO);
     LegalIdentifier();
     InsertColumnsAndSource();
+    {if (true) return new InsertQuery();}
+    throw new Error("Missing return statement in function");
   }
 
   final public void InsertColumnsAndSource() throws ParseException {
@@ -597,7 +602,7 @@ public class Parser implements ParserConstants {
     }
   }
 
-  final public void Delete() throws ParseException {
+  final public DeleteQuery Delete() throws ParseException {
     jj_consume_token(DELETE);
     jj_consume_token(FROM);
     LegalIdentifier();
@@ -609,6 +614,8 @@ public class Parser implements ParserConstants {
       jj_la1[26] = jj_gen;
       ;
     }
+    {if (true) return new DeleteQuery();}
+    throw new Error("Missing return statement in function");
   }
 
   final public String LegalIdentifier() throws ParseException {
@@ -653,6 +660,17 @@ public class Parser implements ParserConstants {
     finally { jj_save(3, xla); }
   }
 
+  private boolean jj_3_3() {
+    if (jj_3R_9()) return true;
+    if (jj_scan_token(PERIOD)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_10()) return true;
+    return false;
+  }
+
   private boolean jj_3_4() {
     if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
@@ -685,17 +703,6 @@ public class Parser implements ParserConstants {
 
   private boolean jj_3R_9() {
     if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
-    return false;
-  }
-
-  private boolean jj_3_3() {
-    if (jj_3R_9()) return true;
-    if (jj_scan_token(PERIOD)) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_10()) return true;
     return false;
   }
 

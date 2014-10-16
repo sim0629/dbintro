@@ -128,7 +128,7 @@ TOKEN:
 | < ALPHABET: ["a"-"z","A"-"Z"] >
 }
 
-boolean Parse(ArrayList<String> results):
+boolean Parse(ArrayList<BaseQuery> results):
 {
   boolean exit;
 }
@@ -144,9 +144,9 @@ boolean Parse(ArrayList<String> results):
   { return exit; }
 }
 
-void QueryList(ArrayList<String> results):
+void QueryList(ArrayList<BaseQuery> results):
 {
-  String result;
+  BaseQuery result;
 }
 {
   result = Query()
@@ -158,59 +158,56 @@ void QueryList(ArrayList<String> results):
   )*
 }
 
-String Query():
+BaseQuery Query():
 {
-  String result;
+  BaseQuery result;
 }
 {
   (
-    CreateTable()
-    { result = "create table"; }
-  | DropTable()
-    { result = "drop table"; }
-  | ShowTables()
-    { result = "show tables"; }
-  | Describe()
-    { result = "desc"; }
-  | Select()
-    { result = "select"; }
-  | Insert()
-    { result = "insert"; }
-  | Delete()
-    { result = "delete"; }
+    result = CreateTable()
+  | result = DropTable()
+  | result = ShowTables()
+  | result = Describe()
+  | result = Select()
+  | result = Insert()
+  | result = Delete()
   )
   { return result; }
 }
 
-void CreateTable():
+CreateTableQuery CreateTable():
 {}
 {
   < CREATE >
   < TABLE >
   LegalIdentifier() // TABLE_NAME
   TableElementList()
+  { return new CreateTableQuery(); }
 }
 
-void DropTable():
+DropTableQuery DropTable():
 {}
 {
   < DROP >
   < TABLE >
   LegalIdentifier() // TABLE_NAME
+  { return new DropTableQuery(); }
 }
 
-void ShowTables():
+ShowTablesQuery ShowTables():
 {}
 {
   < SHOW >
   < TABLES >
+  { return new ShowTablesQuery(); }
 }
 
-void Describe():
+DescribeQuery Describe():
 {}
 {
   < DESC >
   LegalIdentifier() // TABLE_NAME
+  { return new DescribeQuery(); }
 }
 
 void TableElementList():
@@ -294,12 +291,13 @@ void ColumnNameList():
   < RIGHT_PAREN >
 }
 
-void Select():
+SelectQuery Select():
 {}
 {
   < SELECT >
   SelectList()
   TableExpression()
+  { return new SelectQuery(); }
 }
 
 void SelectList():
@@ -482,13 +480,14 @@ void NullOperation():
   < NULL >
 }
 
-void Insert():
+InsertQuery Insert():
 {}
 {
   < INSERT >
   < INTO >
   LegalIdentifier() // TABLE_NAME
   InsertColumnsAndSource()
+  { return new InsertQuery(); }
 }
 
 void InsertColumnsAndSource():
@@ -520,7 +519,7 @@ void Value():
 | ComparableValue()
 }
 
-void Delete():
+DeleteQuery Delete():
 {}
 {
   < DELETE >
@@ -529,6 +528,7 @@ void Delete():
   (
     WhereClause()
   )?
+  { return new DeleteQuery(); }
 }
 
 String LegalIdentifier():

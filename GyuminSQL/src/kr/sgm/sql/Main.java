@@ -10,7 +10,7 @@ public class Main {
       System.out.print(PROMPT);
       Parser parser = new Parser(System.in);
       // 파싱 결과를 저장할 리스트.
-      ArrayList<String> results = new ArrayList<String>();
+      ArrayList<BaseQuery> results = new ArrayList<BaseQuery>();
       try {
         try {
           // Parse는 종료할지를 boolean 값으로 리턴한다.
@@ -21,8 +21,8 @@ public class Main {
           if(parser.Parse(results)) break;
         }finally {
           // Parse가 Exception을 발생하든 안하든 실행되는 block이다.
-          for(String result : results)
-            System.out.printf("\"%s\" requested\n", result);
+          for(BaseQuery result : results)
+            result.run();
         }
       }catch(ParseException ex) {
         System.out.println("Syntax error");
