@@ -176,119 +176,182 @@ BaseQuery Query():
 }
 
 CreateTableQuery CreateTable():
-{}
+{
+  CreateTableQuery query = new CreateTableQuery();
+  String tableName;
+}
 {
   < CREATE >
   < TABLE >
-  LegalIdentifier() // TABLE_NAME
-  TableElementList()
-  { return new CreateTableQuery(); }
+  tableName = LegalIdentifier()
+  { query.setTableName(tableName); }
+  TableElementList(query)
+  { return query; }
 }
 
 DropTableQuery DropTable():
-{}
+{
+  DropTableQuery query = new DropTableQuery();
+  String tableName;
+}
 {
   < DROP >
   < TABLE >
-  LegalIdentifier() // TABLE_NAME
-  { return new DropTableQuery(); }
+  tableName = LegalIdentifier()
+  { query.setTableName(tableName); }
+  { return query; }
 }
 
 ShowTablesQuery ShowTables():
-{}
+{
+  ShowTablesQuery query = new ShowTablesQuery();
+}
 {
   < SHOW >
   < TABLES >
-  { return new ShowTablesQuery(); }
+  { return query; }
 }
 
 DescribeQuery Describe():
-{}
+{
+  DescribeQuery query = new DescribeQuery();
+  String tableName;
+}
 {
   < DESC >
-  LegalIdentifier() // TABLE_NAME
-  { return new DescribeQuery(); }
+  tableName = LegalIdentifier()
+  { query.setTableName(tableName); }
+  { return query; }
 }
 
-void TableElementList():
+void TableElementList(CreateTableQuery query):
 {}
 {
   < LEFT_PAREN >
-  TableElement()
+  TableElement(query)
   (
     < COMMA >
-    TableElement()
+    TableElement(query)
   )*
   < RIGHT_PAREN >
 }
 
-void TableElement():
-{}
+void TableElement(CreateTableQuery query):
 {
-  ColumnDefinition()
-| TableConstraintDefinition()
+  QueryColumnDefinition columnDefinition;
+}
+{
+  columnDefinition = ColumnDefinition()
+  { query.addColumnDefinition(columnDefinition); }
+| TableConstraintDefinition(query)
 }
 
-void ColumnDefinition():
-{}
+QueryColumnDefinition ColumnDefinition():
 {
-  LegalIdentifier() // COLUMN_NAME
-  DataType()
+  String columnName;
+  QueryDataType dataType;
+  boolean nullable = true;
+}
+{
+  columnName = LegalIdentifier()
+  dataType = DataType()
   (
     < NOT >
     < NULL >
+    { nullable = false; }
   )?
+  {
+    return new QueryColumnDefinition(
+      columnName,
+      dataType,
+      nullable
+    );
+  }
 }
 
-void TableConstraintDefinition():
-{}
+void TableConstraintDefinition(CreateTableQuery query):
 {
-  PrimaryKeyConstraint()
-| ReferentialConstraint()
+  QueryPrimaryKeyConstraint primaryKeyConstraint;
+  QueryReferentialConstraint referentialConstraint;
 }
-
-void DataType():
-{}
 {
-  < INT >
-|
-  < CHAR >
-  < LEFT_PAREN >
-  < INT_VALUE >
-  < RIGHT_PAREN >
-|
-  < DATE >
+  primaryKeyConstraint = PrimaryKeyConstraint()
+  { query.addPrimaryKeyConstraint(primaryKeyConstraint); }
+| referentialConstraint = ReferentialConstraint()
+  { query.addReferentialConstraint(referentialConstraint); }
 }
 
-void PrimaryKeyConstraint():
-{}
+QueryDataType DataType():
+{
+  QueryDataType result;
+  int length;
+}
+{
+  (
+    < INT >
+    { result = QueryDataType.createInt(); }
+  |
+    < CHAR >
+    < LEFT_PAREN >
+    length = IntValue()
+    < RIGHT_PAREN >
+    { result = QueryDataType.createChar(length); }
+  |
+    < DATE >
+    { result = QueryDataType.createDate(); }
+  )
+  { return result; }
+}
+
+QueryPrimaryKeyConstraint PrimaryKeyConstraint():
+{
+  ArrayList<String> columnNames;
+}
 {
   < PRIMARY >
   < KEY >
-  ColumnNameList()
+  columnNames = ColumnNameList()
+  { return new QueryPrimaryKeyConstraint(columnNames); }
 }
 
-void ReferentialConstraint():
-{}
+QueryReferentialConstraint ReferentialConstraint():
+{
+  ArrayList<String> ourColumnNames;
+  String theirTableName;
+  ArrayList<String> theirColumnNames;
+}
 {
   < FOREIGN >
   < KEY >
-  ColumnNameList()
+  ourColumnNames = ColumnNameList()
   < REFERENCES >
-  LegalIdentifier() // TABLE_NAME
-  ColumnNameList()
+  theirTableName = LegalIdentifier()
+  theirColumnNames = ColumnNameList()
+  {
+    return new QueryReferentialConstraint(
+      ourColumnNames,
+      theirTableName,
+      theirColumnNames
+    );
+  }
 }
 
-void ColumnNameList():
-{}
+ArrayList<String> ColumnNameList():
+{
+  ArrayList<String> columnNames = new ArrayList<String>();
+  String columnName;
+}
 {
   < LEFT_PAREN >
-  LegalIdentifier() // COLUMN_NAME
+  columnName = LegalIdentifier()
+  { columnNames.add(columnName); }
   (
     < COMMA >
-    LegalIdentifier() // COLUMN_NAME
+    columnName = LegalIdentifier()
+    { columnNames.add(columnName); }
   )*
   < RIGHT_PAREN >
+  { return columnNames; }
 }
 
 SelectQuery Select():
@@ -546,5 +609,23 @@ String LegalIdentifier():
     if(isKeyword(identifier))
       throw new ParseException();
     return identifier;
+  }
+}
+
+int IntValue():
+{
+  Token t;
+}
+{
+  t = < INT_VALUE >
+  {
+    try {
+      return Integer.parseInt(t.image);
+    }catch(NumberFormatException ex) {
+      // INT_VALUE 토큰의 정의에 의해
+      // 이 예외가 발생하는 경우는
+      // int 값이 32bit를 넘어갈 때이다.
+      throw new ParseException();
+    }
   }
 }

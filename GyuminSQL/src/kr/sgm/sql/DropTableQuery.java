@@ -5,4 +5,10 @@ class DropTableQuery extends BaseQuery {
   final String getTypeString() {
     return "drop table";
   }
+
+  private String tableName;
+
+  void setTableName(String tableName) {
+    this.tableName = tableName;
+  }
 }

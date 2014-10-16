@@ -128,39 +128,49 @@ public class Parser implements ParserConstants {
   }
 
   final public CreateTableQuery CreateTable() throws ParseException {
+  CreateTableQuery query = new CreateTableQuery();
+  String tableName;
     jj_consume_token(CREATE);
     jj_consume_token(TABLE);
-    LegalIdentifier();
-    TableElementList();
-    {if (true) return new CreateTableQuery();}
+    tableName = LegalIdentifier();
+    query.setTableName(tableName);
+    TableElementList(query);
+    {if (true) return query;}
     throw new Error("Missing return statement in function");
   }
 
   final public DropTableQuery DropTable() throws ParseException {
+  DropTableQuery query = new DropTableQuery();
+  String tableName;
     jj_consume_token(DROP);
     jj_consume_token(TABLE);
-    LegalIdentifier();
-    {if (true) return new DropTableQuery();}
+    tableName = LegalIdentifier();
+    query.setTableName(tableName);
+    {if (true) return query;}
     throw new Error("Missing return statement in function");
   }
 
   final public ShowTablesQuery ShowTables() throws ParseException {
+  ShowTablesQuery query = new ShowTablesQuery();
     jj_consume_token(SHOW);
     jj_consume_token(TABLES);
-    {if (true) return new ShowTablesQuery();}
+    {if (true) return query;}
     throw new Error("Missing return statement in function");
   }
 
   final public DescribeQuery Describe() throws ParseException {
+  DescribeQuery query = new DescribeQuery();
+  String tableName;
     jj_consume_token(DESC);
-    LegalIdentifier();
-    {if (true) return new DescribeQuery();}
+    tableName = LegalIdentifier();
+    query.setTableName(tableName);
+    {if (true) return query;}
     throw new Error("Missing return statement in function");
   }
 
-  final public void TableElementList() throws ParseException {
+  final public void TableElementList(CreateTableQuery query) throws ParseException {
     jj_consume_token(LEFT_PAREN);
-    TableElement();
+    TableElement(query);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -172,19 +182,21 @@ public class Parser implements ParserConstants {
         break label_2;
       }
       jj_consume_token(COMMA);
-      TableElement();
+      TableElement(query);
     }
     jj_consume_token(RIGHT_PAREN);
   }
 
-  final public void TableElement() throws ParseException {
+  final public void TableElement(CreateTableQuery query) throws ParseException {
+  QueryColumnDefinition columnDefinition;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case LEGAL_IDENTIFIER:
-      ColumnDefinition();
+      columnDefinition = ColumnDefinition();
+    query.addColumnDefinition(columnDefinition);
       break;
     case PRIMARY:
     case FOREIGN:
-      TableConstraintDefinition();
+      TableConstraintDefinition(query);
       break;
     default:
       jj_la1[4] = jj_gen;
@@ -193,27 +205,41 @@ public class Parser implements ParserConstants {
     }
   }
 
-  final public void ColumnDefinition() throws ParseException {
-    LegalIdentifier();
-    DataType();
+  final public QueryColumnDefinition ColumnDefinition() throws ParseException {
+  String columnName;
+  QueryDataType dataType;
+  boolean nullable = true;
+    columnName = LegalIdentifier();
+    dataType = DataType();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NOT:
       jj_consume_token(NOT);
       jj_consume_token(NULL);
+      nullable = false;
       break;
     default:
       jj_la1[5] = jj_gen;
       ;
     }
+    {if (true) return new QueryColumnDefinition(
+      columnName,
+      dataType,
+      nullable
+    );}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void TableConstraintDefinition() throws ParseException {
+  final public void TableConstraintDefinition(CreateTableQuery query) throws ParseException {
+  QueryPrimaryKeyConstraint primaryKeyConstraint;
+  QueryReferentialConstraint referentialConstraint;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case PRIMARY:
-      PrimaryKeyConstraint();
+      primaryKeyConstraint = PrimaryKeyConstraint();
+    query.addPrimaryKeyConstraint(primaryKeyConstraint);
       break;
     case FOREIGN:
-      ReferentialConstraint();
+      referentialConstraint = ReferentialConstraint();
+    query.addReferentialConstraint(referentialConstraint);
       break;
     default:
       jj_la1[6] = jj_gen;
@@ -222,45 +248,67 @@ public class Parser implements ParserConstants {
     }
   }
 
-  final public void DataType() throws ParseException {
+  final public QueryDataType DataType() throws ParseException {
+  QueryDataType result;
+  int length;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INT:
       jj_consume_token(INT);
+      result = QueryDataType.createInt();
       break;
     case CHAR:
       jj_consume_token(CHAR);
       jj_consume_token(LEFT_PAREN);
-      jj_consume_token(INT_VALUE);
+      length = IntValue();
       jj_consume_token(RIGHT_PAREN);
+      result = QueryDataType.createChar(length);
       break;
     case DATE:
       jj_consume_token(DATE);
+      result = QueryDataType.createDate();
       break;
     default:
       jj_la1[7] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    {if (true) return result;}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void PrimaryKeyConstraint() throws ParseException {
+  final public QueryPrimaryKeyConstraint PrimaryKeyConstraint() throws ParseException {
+  ArrayList<String> columnNames;
     jj_consume_token(PRIMARY);
     jj_consume_token(KEY);
-    ColumnNameList();
+    columnNames = ColumnNameList();
+    {if (true) return new QueryPrimaryKeyConstraint(columnNames);}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void ReferentialConstraint() throws ParseException {
+  final public QueryReferentialConstraint ReferentialConstraint() throws ParseException {
+  ArrayList<String> ourColumnNames;
+  String theirTableName;
+  ArrayList<String> theirColumnNames;
     jj_consume_token(FOREIGN);
     jj_consume_token(KEY);
-    ColumnNameList();
+    ourColumnNames = ColumnNameList();
     jj_consume_token(REFERENCES);
-    LegalIdentifier();
-    ColumnNameList();
+    theirTableName = LegalIdentifier();
+    theirColumnNames = ColumnNameList();
+    {if (true) return new QueryReferentialConstraint(
+      ourColumnNames,
+      theirTableName,
+      theirColumnNames
+    );}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void ColumnNameList() throws ParseException {
+  final public ArrayList<String> ColumnNameList() throws ParseException {
+  ArrayList<String> columnNames = new ArrayList<String>();
+  String columnName;
     jj_consume_token(LEFT_PAREN);
-    LegalIdentifier();
+    columnName = LegalIdentifier();
+    columnNames.add(columnName);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -272,9 +320,12 @@ public class Parser implements ParserConstants {
         break label_3;
       }
       jj_consume_token(COMMA);
-      LegalIdentifier();
+      columnName = LegalIdentifier();
+      columnNames.add(columnName);
     }
     jj_consume_token(RIGHT_PAREN);
+    {if (true) return columnNames;}
+    throw new Error("Missing return statement in function");
   }
 
   final public SelectQuery Select() throws ParseException {
@@ -629,6 +680,20 @@ public class Parser implements ParserConstants {
     if(isKeyword(identifier))
       {if (true) throw new ParseException();}
     {if (true) return identifier;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public int IntValue() throws ParseException {
+  Token t;
+    t = jj_consume_token(INT_VALUE);
+    try {
+      {if (true) return Integer.parseInt(t.image);}
+    }catch(NumberFormatException ex) {
+      // INT_VALUE 토큰의 정의에 의해
+      // 이 예외가 발생하는 경우는
+      // int 값이 32bit를 넘어갈 때이다.
+      {if (true) throw new ParseException();}
+    }
     throw new Error("Missing return statement in function");
   }
 
