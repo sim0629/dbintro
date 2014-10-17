@@ -75,4 +75,25 @@ class DatabaseHandler<K, T> {
       close();
     }
   }
+
+  // 모든 entity를 불러와 반환한다.
+  ArrayList<T> all() {
+    open();
+    try {
+      PrimaryIndex<K, T> idx = store.getPrimaryIndex(keyType, entityType);
+      EntityCursor<T> cursor = idx.entities();
+      try {
+        ArrayList<T> entities = new ArrayList<T>();
+        for(T entity : cursor)
+          entities.add(entity);
+        return entities;
+      }finally {
+        cursor.close();
+      }
+    }catch(DatabaseException ex) {
+      return null;
+    }finally {
+      close();
+    }
+  }
 }
