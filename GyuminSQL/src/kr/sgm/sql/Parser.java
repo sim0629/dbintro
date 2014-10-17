@@ -44,7 +44,7 @@ public class Parser implements ParserConstants {
   // 식별자가 키워드 목록에 포함되는지 검사한다.
   // 대소문자 구분없이 비교한다.
   private static boolean isKeyword(String identifier) {
-    return Keywords.contains(identifier.toLowerCase());
+    return Keywords.contains(identifier);
   }
 
   final public boolean Parse(ArrayList<BaseQuery> results) throws ParseException {
@@ -672,7 +672,7 @@ public class Parser implements ParserConstants {
   final public String LegalIdentifier() throws ParseException {
   Token t;
     t = jj_consume_token(LEGAL_IDENTIFIER);
-    String identifier = t.image;
+    String identifier = t.image.toLowerCase();
     // 식별자가 키워드일 경우 예외를 발생한다.
     // 키워드 토큰은 대소문자 구분을 해서 소문자만 되지만
     // 식별자는 대소문자 구분을 하지 않으므로
