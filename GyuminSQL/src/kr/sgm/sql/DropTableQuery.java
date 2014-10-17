@@ -1,6 +1,8 @@
 package kr.sgm.sql;
 
-class DropTableQuery extends BaseQuery {
+import kr.sgm.sql.entity.*;
+
+class DropTableQuery extends BaseQuery implements IDefinitionQuery {
   @Override
   final String getTypeString() {
     return "drop table";
@@ -10,5 +12,24 @@ class DropTableQuery extends BaseQuery {
 
   void setTableName(String tableName) {
     this.tableName = tableName;
+  }
+
+  @Override
+  void run() throws InvalidQueryException {
+    Table tableToDrop = infoHandler.load(this.tableName);
+    if(tableToDrop == null)
+      throw new InvalidQueryException(Messages.NoSuchTable);
+
+    // 참조 받고 있는지 확인
+    for(Table table : infoHandler.all()) {
+      for(Column column : table.getColumns()) {
+        if(this.tableName.equals(column.getRefTableName()))
+          throw new InvalidQueryException(String.format(Messages.DropReferencedTableErrorS, this.tableName));
+      }
+    }
+
+    infoHandler.remove(this.tableName);
+    System.out.printf(Messages.DropSuccessS, this.tableName);
+    System.out.println("");
   }
 }

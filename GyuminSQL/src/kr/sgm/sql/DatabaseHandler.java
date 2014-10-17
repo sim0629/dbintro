@@ -96,4 +96,18 @@ class DatabaseHandler<K, T> {
       close();
     }
   }
+
+  // key에 해당하는 entity를 지우고 성공 여부를 반환한다.
+  boolean remove(K key) {
+    open();
+    try {
+      PrimaryIndex<K, T> idx = store.getPrimaryIndex(keyType, entityType);
+      idx.delete(key);
+      return true;
+    }catch(DatabaseException ex) {
+      return false;
+    }finally {
+      close();
+    }
+  }
 }
