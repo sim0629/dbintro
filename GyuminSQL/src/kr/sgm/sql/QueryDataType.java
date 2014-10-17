@@ -5,8 +5,8 @@ final class QueryDataType {
   private static final int CHAR = 2;
   private static final int DATE = 3;
 
-  int type;
-  int capacity;
+  private int type;
+  private int capacity;
 
   boolean isInt() {
     return this.type == INT;
@@ -18,6 +18,10 @@ final class QueryDataType {
 
   boolean isDate() {
     return this.type == DATE;
+  }
+
+  int getLength() {
+    return this.capacity;
   }
 
   static QueryDataType createInt() {

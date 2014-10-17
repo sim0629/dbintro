@@ -12,23 +12,25 @@ public final class DataType {
   private int capacity;
 
   public static DataType createInt() {
-    DataType t = new DataType(INT);
+    DataType t = new DataType();
+    t.type = INT;
     return t;
   }
 
   public static DataType createChar(int length) {
-    DataType t = new DataType(CHAR);
+    DataType t = new DataType();
+    t.type = CHAR;
     t.capacity = length;
     return t;
   }
 
   public static DataType createDate() {
-    DataType t = new DataType(DATE);
+    DataType t = new DataType();
+    t.type = DATE;
     return t;
   }
 
-  private DataType(int type) {
-    this.type = type;
+  private DataType() {
   }
 
   @Override
@@ -41,5 +43,21 @@ public final class DataType {
       return "date";
     else
       throw new IllegalStateException();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if(o == this)
+      return true;
+    if(!(o instanceof DataType))
+      return false;
+    DataType dt = (DataType)o;
+    return dt.type == this.type
+      && dt.capacity == this.capacity;
+  }
+
+  @Override
+  public int hashCode() {
+    return this.capacity * 4 + this.type;
   }
 }

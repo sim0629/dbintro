@@ -9,6 +9,8 @@ public final class Column {
   private boolean nullable;
   private boolean isPrimaryKey;
   private boolean isForeignKey;
+  private String refTableName;
+  private String refColumnName;
 
   public String getName() {
     return this.name;
@@ -43,5 +45,19 @@ public final class Column {
   }
   public void setIsForeignKey(boolean isForeignKey) {
     this.isForeignKey = isForeignKey;
+  }
+
+  public String getRefTableName() {
+    return this.refTableName;
+  }
+  public void setRefTableName(String refTableName) {
+    this.refTableName = refTableName;
+  }
+
+  public String getRefColumnName() {
+    return this.refColumnName;
+  }
+  public void setRefColumnName(String refColumnName) {
+    this.refColumnName = refColumnName;
   }
 }

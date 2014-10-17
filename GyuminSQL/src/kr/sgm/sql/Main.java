@@ -21,11 +21,16 @@ public class Main {
           if(parser.Parse(results)) break;
         }finally {
           // Parse가 Exception을 발생하든 안하든 실행되는 block이다.
-          for(BaseQuery result : results)
-            result.run();
+          for(BaseQuery result : results) {
+            try {
+              result.run();
+            }catch(InvalidQueryException ex) {
+              System.out.println(ex.getMessage());
+            }
+          }
         }
       }catch(ParseException ex) {
-        System.out.println("Syntax error");
+        System.out.println(Messages.SyntaxError);
       }
     }
   }
