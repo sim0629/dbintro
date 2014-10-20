@@ -30,6 +30,8 @@ public final class DataType {
     return t;
   }
 
+  // createXXX static method를 통해서만
+  // 인스턴스를 만들 수 있게 제한한다.
   private DataType() {
   }
 

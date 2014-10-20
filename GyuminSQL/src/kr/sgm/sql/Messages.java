@@ -1,6 +1,11 @@
 package kr.sgm.sql;
 
 final class Messages {
+  // 이름 규칙
+  //  스트링이 포맷으로 사용될 경우(인자를 받아야 하는 경우)
+  //  이름 뒤에 인자의 타입을 영문 대문자 한글자로 표시한다.
+  //  (String은 S, Integer는 D 등)
+  //  인자가 여러개인 경우 순서대로 이어서 표시한다.
   static final String TemporarySuccessS = "'%s' requested";
   static final String SyntaxError = "Syntax error";
   static final String CreateTableSuccessS = "'%s' table is created";
