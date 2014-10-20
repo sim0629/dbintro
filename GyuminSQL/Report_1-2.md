@@ -17,6 +17,7 @@ GyuminSQL 프로젝트를 이클립스에서 열어 실행하면 된다.
 ----------------
 - Foreign key는 다른 테이블의 primary key만 참조할 수 있다. Primary key가 composite key일 경우에 key를 구성하는 일부 column만 참조될 수 없다. 이는 PostgreSQL, SQLPlus 등의 동작을 따르는 것이다.
 - LEGAL IDENTIFIER는 대소문자를 구분하지 않으며, 사용자 입력을 받았을 때 Parser에서 모두 소문자로 바꾸어 처리한다.
+- 테이블 이름이나 컬럼 이름이 너무 길 경우 적당한 길이로 잘라서 보여준다.
 
 구조와 설명
 -----------
