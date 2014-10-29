@@ -3,6 +3,7 @@ package kr.sgm.sql;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 public class Parser implements ParserConstants {
   // 키워드 목록
@@ -45,6 +46,15 @@ public class Parser implements ParserConstants {
   // 대소문자 구분없이 비교한다.
   private static boolean isKeyword(String identifier) {
     return Keywords.contains(identifier);
+  }
+
+  private static java.text.SimpleDateFormat dateFormat =
+    new java.text.SimpleDateFormat("yyyy-MM-dd");
+
+  static {
+    // 형식이 잘못된 입력에 대해 parse할 때
+    // ParseException을 내도록 설정 한다.
+    dateFormat.setLenient(false);
   }
 
   final public boolean Parse(ArrayList<BaseQuery> results) throws ParseException {
@@ -553,22 +563,31 @@ public class Parser implements ParserConstants {
     }
   }
 
-  final public void ComparableValue() throws ParseException {
+  final public QueryComparableValue ComparableValue() throws ParseException {
+  QueryComparableValue value;
+  int i;
+  String s;
+  Date d;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INT_VALUE:
-      jj_consume_token(INT_VALUE);
+      i = IntValue();
+      value = QueryComparableValue.fromInt(i);
       break;
     case CHAR_STRING:
-      jj_consume_token(CHAR_STRING);
+      s = CharString();
+      value = QueryComparableValue.fromString(s);
       break;
     case DATE_VALUE:
-      jj_consume_token(DATE_VALUE);
+      d = DateValue();
+      value = QueryComparableValue.fromDate(d);
       break;
     default:
       jj_la1[21] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    {if (true) return value;}
+    throw new Error("Missing return statement in function");
   }
 
   final public void NullPredicate() throws ParseException {
@@ -596,30 +615,38 @@ public class Parser implements ParserConstants {
   }
 
   final public InsertQuery Insert() throws ParseException {
+  InsertQuery query = new InsertQuery();
+  String tableName;
     jj_consume_token(INSERT);
     jj_consume_token(INTO);
-    LegalIdentifier();
-    InsertColumnsAndSource();
-    {if (true) return new InsertQuery();}
+    tableName = LegalIdentifier();
+    query.setTableName(tableName);
+    InsertColumnsAndSource(query);
+    {if (true) return query;}
     throw new Error("Missing return statement in function");
   }
 
-  final public void InsertColumnsAndSource() throws ParseException {
+  final public void InsertColumnsAndSource(InsertQuery query) throws ParseException {
+  ArrayList<String> columnNames;
+  ArrayList<String> values;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case LEFT_PAREN:
-      ColumnNameList();
+      columnNames = ColumnNameList();
+      query.setColumnNames(columnNames);
       break;
     default:
       jj_la1[23] = jj_gen;
       ;
     }
-    ValueList();
+    ValueList(query);
   }
 
-  final public void ValueList() throws ParseException {
+  final public void ValueList(InsertQuery query) throws ParseException {
+  QueryComparableValue value;
     jj_consume_token(VALUES);
     jj_consume_token(LEFT_PAREN);
-    Value();
+    value = Value();
+    query.addValue(value);
     label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -631,26 +658,31 @@ public class Parser implements ParserConstants {
         break label_8;
       }
       jj_consume_token(COMMA);
-      Value();
+      value = Value();
+      query.addValue(value);
     }
     jj_consume_token(RIGHT_PAREN);
   }
 
-  final public void Value() throws ParseException {
+  final public QueryComparableValue Value() throws ParseException {
+  QueryComparableValue value;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NULL:
       jj_consume_token(NULL);
+    {if (true) return null;}
       break;
     case CHAR_STRING:
     case INT_VALUE:
     case DATE_VALUE:
-      ComparableValue();
+      value = ComparableValue();
+    {if (true) return value;}
       break;
     default:
       jj_la1[25] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
   }
 
   final public DeleteQuery Delete() throws ParseException {
@@ -697,6 +729,28 @@ public class Parser implements ParserConstants {
     throw new Error("Missing return statement in function");
   }
 
+  final public String CharString() throws ParseException {
+  Token t;
+    t = jj_consume_token(CHAR_STRING);
+    {if (true) return t.image.substring(
+      1,
+      t.image.length() - 1
+    );}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public Date DateValue() throws ParseException {
+  Token t;
+    t = jj_consume_token(DATE_VALUE);
+    try {
+      {if (true) return dateFormat.parse(t.image);}
+    }catch(java.text.ParseException ex) {
+      // 자체 ParseException으로 바꾸어 던진다.
+      {if (true) throw new ParseException();}
+    }
+    throw new Error("Missing return statement in function");
+  }
+
   private boolean jj_2_1(int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_1(); }
@@ -736,6 +790,11 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+  private boolean jj_3R_9() {
+    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
+    return false;
+  }
+
   private boolean jj_3_4() {
     if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
@@ -763,11 +822,6 @@ public class Parser implements ParserConstants {
     if (jj_3_4()) jj_scanpos = xsp;
     if (jj_3R_9()) return true;
     if (jj_3R_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_9() {
-    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
     return false;
   }
 

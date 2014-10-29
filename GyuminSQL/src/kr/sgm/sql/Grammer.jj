@@ -8,6 +8,7 @@ package kr.sgm.sql;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 public class Parser {
   // 키워드 목록
@@ -50,6 +51,15 @@ public class Parser {
   // 대소문자 구분없이 비교한다.
   private static boolean isKeyword(String identifier) {
     return Keywords.contains(identifier);
+  }
+
+  private static java.text.SimpleDateFormat dateFormat =
+    new java.text.SimpleDateFormat("yyyy-MM-dd");
+
+  static {
+    // 형식이 잘못된 입력에 대해 parse할 때
+    // ParseException을 내도록 설정 한다.
+    dateFormat.setLenient(false);
   }
 }
 
@@ -512,12 +522,23 @@ void CompOperand():
   LegalIdentifier() // COLUMN_NAME
 }
 
-void ComparableValue():
-{}
+QueryComparableValue ComparableValue():
 {
-  < INT_VALUE >
-| < CHAR_STRING >
-| < DATE_VALUE >
+  QueryComparableValue value;
+  int i;
+  String s;
+  Date d;
+}
+{
+  (
+    i = IntValue()
+    { value = QueryComparableValue.fromInt(i); }
+  | s = CharString()
+    { value = QueryComparableValue.fromString(s); }
+  | d = DateValue()
+    { value = QueryComparableValue.fromDate(d); }
+  )
+  { return value; }
 }
 
 void NullPredicate():
@@ -544,42 +565,58 @@ void NullOperation():
 }
 
 InsertQuery Insert():
-{}
+{
+  InsertQuery query = new InsertQuery();
+  String tableName;
+}
 {
   < INSERT >
   < INTO >
-  LegalIdentifier() // TABLE_NAME
-  InsertColumnsAndSource()
-  { return new InsertQuery(); }
+  tableName = LegalIdentifier()
+  { query.setTableName(tableName); }
+  InsertColumnsAndSource(query)
+  { return query; }
 }
 
-void InsertColumnsAndSource():
-{}
+void InsertColumnsAndSource(InsertQuery query):
+{
+  ArrayList<String> columnNames;
+  ArrayList<String> values;
+}
 {
   (
-    ColumnNameList()
+    columnNames = ColumnNameList()
+    { query.setColumnNames(columnNames); }
   )?
-  ValueList()
+  ValueList(query)
 }
 
-void ValueList():
-{}
+void ValueList(InsertQuery query):
+{
+  QueryComparableValue value;
+}
 {
   < VALUES >
   < LEFT_PAREN >
-  Value()
+  value = Value()
+  { query.addValue(value); }
   (
     < COMMA >
-    Value()
+    value = Value()
+    { query.addValue(value); }
   )*
   < RIGHT_PAREN >
 }
 
-void Value():
-{}
+QueryComparableValue Value():
+{
+  QueryComparableValue value;
+}
 {
   < NULL >
-| ComparableValue()
+  { return null; }
+| value = ComparableValue()
+  { return value; }
 }
 
 DeleteQuery Delete():
@@ -625,6 +662,36 @@ int IntValue():
       // INT_VALUE 토큰의 정의에 의해
       // 이 예외가 발생하는 경우는
       // int 값이 32bit를 넘어갈 때이다.
+      throw new ParseException();
+    }
+  }
+}
+
+String CharString():
+{
+  Token t;
+}
+{
+  t = < CHAR_STRING >
+  {
+    return t.image.substring(
+      1,
+      t.image.length() - 1
+    );
+  }
+}
+
+Date DateValue():
+{
+  Token t;
+}
+{
+  t = < DATE_VALUE >
+  {
+    try {
+      return dateFormat.parse(t.image);
+    }catch(java.text.ParseException ex) {
+      // 자체 ParseException으로 바꾸어 던진다.
       throw new ParseException();
     }
   }
