@@ -365,78 +365,100 @@ ArrayList<String> ColumnNameList():
 }
 
 SelectQuery Select():
-{}
+{
+  SelectQuery query = new SelectQuery();
+}
 {
   < SELECT >
-  SelectList()
-  TableExpression()
-  { return new SelectQuery(); }
+  SelectList(query)
+  TableExpression(query)
+  { return query; }
 }
 
-void SelectList():
-{}
+void SelectList(SelectQuery query):
+{
+  QuerySelectedColumn selectedColumn;
+}
 {
   < STAR >
 |
   (
-    SelectedColumn()
+    selectedColumn = SelectedColumn()
+    { query.addSelectedColumn(selectedColumn); }
     (
       < COMMA >
-      SelectedColumn()
+      selectedColumn = SelectedColumn()
+      { query.addSelectedColumn(selectedColumn); }
     )*
   )
 }
 
-void SelectedColumn():
-{}
+QuerySelectedColumn SelectedColumn():
+{
+  String tableName = null;
+  String columnName;
+  String alias = null;
+}
 {
   (
     // < PERIOD >가 있는지 확인하기 위해 토큰 두개를 미리본다.
     LOOKAHEAD(2)
-    LegalIdentifier() // TABLE_NAME
+    tableName = LegalIdentifier()
     < PERIOD >
   )?
-  LegalIdentifier() // COLUMN_NAME
+  columnName = LegalIdentifier()
   (
     < AS >
-    LegalIdentifier() // COLUMN_NAME
+    alias = LegalIdentifier()
   )?
+  { return new QuerySelectedColumn(tableName, columnName, alias); }
 }
 
-void TableExpression():
-{}
+void TableExpression(SelectQuery query):
 {
-  FromClause()
+  QueryWhereClause where;
+}
+{
+  FromClause(query)
   (
-    WhereClause()
+    where = WhereClause()
+    { query.setWhereClause(where); }
   )?
 }
 
-void FromClause():
+void FromClause(SelectQuery query):
 {}
 {
   < FROM >
-  TableReferenceList()
+  TableReferenceList(query)
 }
 
-void TableReferenceList():
-{}
+void TableReferenceList(SelectQuery query):
 {
-  ReferedTable()
+  QueryReferedTable referedTable;
+}
+{
+  referedTable = ReferedTable()
+  { query.addReferedTable(referedTable); }
   (
     < COMMA >
-    ReferedTable()
+    referedTable = ReferedTable()
+    { query.addReferedTable(referedTable); }
   )*
 }
 
-void ReferedTable():
-{}
+QueryReferedTable ReferedTable():
 {
-  LegalIdentifier() // TABLE_NAME
+  String tableName;
+  String alias = null;
+}
+{
+  tableName = LegalIdentifier()
   (
     < AS >
-    LegalIdentifier() // TABLE_NAME
+    alias = LegalIdentifier()
   )?
+  { return new QueryReferedTable(tableName, alias); }
 }
 
 QueryWhereClause WhereClause():

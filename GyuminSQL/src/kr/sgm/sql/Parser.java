@@ -339,20 +339,23 @@ public class Parser implements ParserConstants {
   }
 
   final public SelectQuery Select() throws ParseException {
+  SelectQuery query = new SelectQuery();
     jj_consume_token(SELECT);
-    SelectList();
-    TableExpression();
-    {if (true) return new SelectQuery();}
+    SelectList(query);
+    TableExpression(query);
+    {if (true) return query;}
     throw new Error("Missing return statement in function");
   }
 
-  final public void SelectList() throws ParseException {
+  final public void SelectList(SelectQuery query) throws ParseException {
+  QuerySelectedColumn selectedColumn;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case STAR:
       jj_consume_token(STAR);
       break;
     case LEGAL_IDENTIFIER:
-      SelectedColumn();
+      selectedColumn = SelectedColumn();
+      query.addSelectedColumn(selectedColumn);
       label_4:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -364,7 +367,8 @@ public class Parser implements ParserConstants {
           break label_4;
         }
         jj_consume_token(COMMA);
-        SelectedColumn();
+        selectedColumn = SelectedColumn();
+        query.addSelectedColumn(selectedColumn);
       }
       break;
     default:
@@ -374,30 +378,37 @@ public class Parser implements ParserConstants {
     }
   }
 
-  final public void SelectedColumn() throws ParseException {
+  final public QuerySelectedColumn SelectedColumn() throws ParseException {
+  String tableName = null;
+  String columnName;
+  String alias = null;
     if (jj_2_1(2)) {
-      LegalIdentifier();
+      tableName = LegalIdentifier();
       jj_consume_token(PERIOD);
     } else {
       ;
     }
-    LegalIdentifier();
+    columnName = LegalIdentifier();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case AS:
       jj_consume_token(AS);
-      LegalIdentifier();
+      alias = LegalIdentifier();
       break;
     default:
       jj_la1[11] = jj_gen;
       ;
     }
+    {if (true) return new QuerySelectedColumn(tableName, columnName, alias);}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void TableExpression() throws ParseException {
-    FromClause();
+  final public void TableExpression(SelectQuery query) throws ParseException {
+  QueryWhereClause where;
+    FromClause(query);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case WHERE:
-      WhereClause();
+      where = WhereClause();
+      query.setWhereClause(where);
       break;
     default:
       jj_la1[12] = jj_gen;
@@ -405,13 +416,15 @@ public class Parser implements ParserConstants {
     }
   }
 
-  final public void FromClause() throws ParseException {
+  final public void FromClause(SelectQuery query) throws ParseException {
     jj_consume_token(FROM);
-    TableReferenceList();
+    TableReferenceList(query);
   }
 
-  final public void TableReferenceList() throws ParseException {
-    ReferedTable();
+  final public void TableReferenceList(SelectQuery query) throws ParseException {
+  QueryReferedTable referedTable;
+    referedTable = ReferedTable();
+    query.addReferedTable(referedTable);
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -423,21 +436,26 @@ public class Parser implements ParserConstants {
         break label_5;
       }
       jj_consume_token(COMMA);
-      ReferedTable();
+      referedTable = ReferedTable();
+      query.addReferedTable(referedTable);
     }
   }
 
-  final public void ReferedTable() throws ParseException {
-    LegalIdentifier();
+  final public QueryReferedTable ReferedTable() throws ParseException {
+  String tableName;
+  String alias = null;
+    tableName = LegalIdentifier();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case AS:
       jj_consume_token(AS);
-      LegalIdentifier();
+      alias = LegalIdentifier();
       break;
     default:
       jj_la1[14] = jj_gen;
       ;
     }
+    {if (true) return new QueryReferedTable(tableName, alias);}
+    throw new Error("Missing return statement in function");
   }
 
   final public QueryWhereClause WhereClause() throws ParseException {
@@ -813,18 +831,18 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_3R_9()) return true;
-    if (jj_scan_token(PERIOD)) return true;
-    return false;
-  }
-
   private boolean jj_3R_10() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_4()) jj_scanpos = xsp;
     if (jj_3R_9()) return true;
     if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_9()) return true;
+    if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 
