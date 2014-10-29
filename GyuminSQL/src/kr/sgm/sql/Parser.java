@@ -440,9 +440,12 @@ public class Parser implements ParserConstants {
     }
   }
 
-  final public void WhereClause() throws ParseException {
+  final public QueryWhereClause WhereClause() throws ParseException {
+  QueryWhereClause where = new QueryWhereClause();
     jj_consume_token(WHERE);
     BooleanValueExpression();
+    {if (true) return where;}
+    throw new Error("Missing return statement in function");
   }
 
   final public void BooleanValueExpression() throws ParseException {
@@ -686,18 +689,23 @@ public class Parser implements ParserConstants {
   }
 
   final public DeleteQuery Delete() throws ParseException {
+  DeleteQuery query = new DeleteQuery();
+  String tableName;
+  QueryWhereClause where;
     jj_consume_token(DELETE);
     jj_consume_token(FROM);
-    LegalIdentifier();
+    tableName = LegalIdentifier();
+    query.setTableName(tableName);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case WHERE:
-      WhereClause();
+      where = WhereClause();
+      query.setWhereClause(where);
       break;
     default:
       jj_la1[26] = jj_gen;
       ;
     }
-    {if (true) return new DeleteQuery();}
+    {if (true) return query;}
     throw new Error("Missing return statement in function");
   }
 
@@ -790,18 +798,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3R_9() {
-    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
-    return false;
-  }
-
   private boolean jj_3_4() {
-    if (jj_3R_9()) return true;
-    if (jj_scan_token(PERIOD)) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
     if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
     return false;
@@ -816,12 +813,23 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+  private boolean jj_3_1() {
+    if (jj_3R_9()) return true;
+    if (jj_scan_token(PERIOD)) return true;
+    return false;
+  }
+
   private boolean jj_3R_10() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_4()) jj_scanpos = xsp;
     if (jj_3R_9()) return true;
     if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_9() {
+    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
     return false;
   }
 

@@ -439,11 +439,14 @@ void ReferedTable():
   )?
 }
 
-void WhereClause():
-{}
+QueryWhereClause WhereClause():
+{
+  QueryWhereClause where = new QueryWhereClause();
+}
 {
   < WHERE >
   BooleanValueExpression()
+  { return where; }
 }
 
 void BooleanValueExpression():
@@ -620,15 +623,21 @@ QueryComparableValue Value():
 }
 
 DeleteQuery Delete():
-{}
+{
+  DeleteQuery query = new DeleteQuery();
+  String tableName;
+  QueryWhereClause where;
+}
 {
   < DELETE >
   < FROM >
-  LegalIdentifier() // TABLE_NAME
+  tableName = LegalIdentifier()
+  { query.setTableName(tableName); }
   (
-    WhereClause()
+    where = WhereClause()
+    { query.setWhereClause(where); }
   )?
-  { return new DeleteQuery(); }
+  { return query; }
 }
 
 String LegalIdentifier():
