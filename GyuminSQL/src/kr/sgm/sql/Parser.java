@@ -403,12 +403,12 @@ public class Parser implements ParserConstants {
   }
 
   final public void TableExpression(SelectQuery query) throws ParseException {
-  QueryWhereClause where;
+  QueryBooleanValueExpression where;
     FromClause(query);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case WHERE:
       where = WhereClause();
-      query.setWhereClause(where);
+      query.setWhere(where);
       break;
     default:
       jj_la1[12] = jj_gen;
@@ -458,15 +458,15 @@ public class Parser implements ParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public QueryWhereClause WhereClause() throws ParseException {
-  QueryWhereClause where = new QueryWhereClause();
+  final public QueryBooleanValueExpression WhereClause() throws ParseException {
+  QueryBooleanValueExpression where;
     jj_consume_token(WHERE);
-    BooleanValueExpression();
+    where = BooleanValueExpression();
     {if (true) return where;}
     throw new Error("Missing return statement in function");
   }
 
-  final public void BooleanValueExpression() throws ParseException {
+  final public QueryBooleanValueExpression BooleanValueExpression() throws ParseException {
     BooleanTerm();
     label_6:
     while (true) {
@@ -481,6 +481,8 @@ public class Parser implements ParserConstants {
       jj_consume_token(OR);
       BooleanTerm();
     }
+    {if (true) return new QueryBooleanValueExpression();}
+    throw new Error("Missing return statement in function");
   }
 
   final public void BooleanTerm() throws ParseException {
@@ -709,7 +711,7 @@ public class Parser implements ParserConstants {
   final public DeleteQuery Delete() throws ParseException {
   DeleteQuery query = new DeleteQuery();
   String tableName;
-  QueryWhereClause where;
+  QueryBooleanValueExpression where;
     jj_consume_token(DELETE);
     jj_consume_token(FROM);
     tableName = LegalIdentifier();
@@ -717,7 +719,7 @@ public class Parser implements ParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case WHERE:
       where = WhereClause();
-      query.setWhereClause(where);
+      query.setWhere(where);
       break;
     default:
       jj_la1[26] = jj_gen;
@@ -840,14 +842,14 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_3R_9()) return true;
-    if (jj_scan_token(PERIOD)) return true;
+  private boolean jj_3R_9() {
+    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
     return false;
   }
 
-  private boolean jj_3R_9() {
-    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
+  private boolean jj_3_1() {
+    if (jj_3R_9()) return true;
+    if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 

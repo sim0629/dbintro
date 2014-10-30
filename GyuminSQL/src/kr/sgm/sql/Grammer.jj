@@ -416,13 +416,13 @@ QuerySelectedColumn SelectedColumn():
 
 void TableExpression(SelectQuery query):
 {
-  QueryWhereClause where;
+  QueryBooleanValueExpression where;
 }
 {
   FromClause(query)
   (
     where = WhereClause()
-    { query.setWhereClause(where); }
+    { query.setWhere(where); }
   )?
 }
 
@@ -461,17 +461,17 @@ QueryReferedTable ReferedTable():
   { return new QueryReferedTable(tableName, alias); }
 }
 
-QueryWhereClause WhereClause():
+QueryBooleanValueExpression WhereClause():
 {
-  QueryWhereClause where = new QueryWhereClause();
+  QueryBooleanValueExpression where;
 }
 {
   < WHERE >
-  BooleanValueExpression()
+  where = BooleanValueExpression()
   { return where; }
 }
 
-void BooleanValueExpression():
+QueryBooleanValueExpression BooleanValueExpression():
 {}
 {
   BooleanTerm()
@@ -479,6 +479,7 @@ void BooleanValueExpression():
     < OR >
     BooleanTerm()
   )*
+  { return new QueryBooleanValueExpression(); }
 }
 
 void BooleanTerm():
@@ -648,7 +649,7 @@ DeleteQuery Delete():
 {
   DeleteQuery query = new DeleteQuery();
   String tableName;
-  QueryWhereClause where;
+  QueryBooleanValueExpression where;
 }
 {
   < DELETE >
@@ -657,7 +658,7 @@ DeleteQuery Delete():
   { query.setTableName(tableName); }
   (
     where = WhereClause()
-    { query.setWhereClause(where); }
+    { query.setWhere(where); }
   )?
   { return query; }
 }

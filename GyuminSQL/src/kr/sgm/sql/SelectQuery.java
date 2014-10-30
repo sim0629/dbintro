@@ -10,7 +10,7 @@ class SelectQuery extends BaseQuery {
 
   private ArrayList<QuerySelectedColumn> selectedColumns = new ArrayList<QuerySelectedColumn>();
   private ArrayList<QueryReferedTable> referedTables = new ArrayList<QueryReferedTable>();
-  private QueryWhereClause where;
+  private QueryBooleanValueExpression where;
 
   void addSelectedColumn(QuerySelectedColumn selectedColumn) {
     this.selectedColumns.add(selectedColumn);
@@ -26,7 +26,7 @@ class SelectQuery extends BaseQuery {
     this.referedTables.add(referedTable);
   }
 
-  void setWhereClause(QueryWhereClause where) {
+  void setWhere(QueryBooleanValueExpression where) {
     this.where = where;
   }
 }

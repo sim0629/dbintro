@@ -7,13 +7,13 @@ class DeleteQuery extends BaseQuery {
   }
 
   private String tableName;
-  private QueryWhereClause where;
+  private QueryBooleanValueExpression where;
 
   void setTableName(String tableName) {
     this.tableName = tableName;
   }
 
-  void setWhereClause(QueryWhereClause where) {
+  void setWhere(QueryBooleanValueExpression where) {
     this.where = where;
   }
 }
