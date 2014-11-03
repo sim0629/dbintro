@@ -467,7 +467,10 @@ public class Parser implements ParserConstants {
   }
 
   final public QueryBooleanValueExpression BooleanValueExpression() throws ParseException {
-    BooleanTerm();
+  QueryBooleanValueExpression x = new QueryBooleanValueExpression();
+  QueryBooleanTerm a;
+    a = BooleanTerm();
+    x.add(a);
     label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -479,14 +482,18 @@ public class Parser implements ParserConstants {
         break label_6;
       }
       jj_consume_token(OR);
-      BooleanTerm();
+      a = BooleanTerm();
+      x.add(a);
     }
-    {if (true) return new QueryBooleanValueExpression();}
+    {if (true) return x;}
     throw new Error("Missing return statement in function");
   }
 
-  final public void BooleanTerm() throws ParseException {
-    BooleanFactor();
+  final public QueryBooleanTerm BooleanTerm() throws ParseException {
+  QueryBooleanTerm x = new QueryBooleanTerm();
+  QueryBooleanFactor a;
+    a = BooleanFactor();
+    x.add(a);
     label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -498,56 +505,77 @@ public class Parser implements ParserConstants {
         break label_7;
       }
       jj_consume_token(AND);
-      BooleanFactor();
+      a = BooleanFactor();
+      x.add(a);
     }
+    {if (true) return x;}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void BooleanFactor() throws ParseException {
+  final public QueryBooleanFactor BooleanFactor() throws ParseException {
+  QueryBooleanFactor x = new QueryBooleanFactor();
+  QueryBooleanTest t;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NOT:
       jj_consume_token(NOT);
+      x.setNot(true);
       break;
     default:
       jj_la1[17] = jj_gen;
       ;
     }
-    BooleanTest();
+    t = BooleanTest();
+    x.setTest(t);
+    {if (true) return x;}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void BooleanTest() throws ParseException {
+  final public QueryBooleanTest BooleanTest() throws ParseException {
+  QueryPredicate p;
+  QueryBooleanValueExpression x;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case LEGAL_IDENTIFIER:
     case CHAR_STRING:
     case INT_VALUE:
     case DATE_VALUE:
-      Predicate();
+      p = Predicate();
+    {if (true) return p;}
       break;
     case LEFT_PAREN:
-      ParenthesizedBooleanExpression();
+      x = ParenthesizedBooleanExpression();
+    {if (true) return x;}
       break;
     default:
       jj_la1[18] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
   }
 
-  final public void ParenthesizedBooleanExpression() throws ParseException {
+  final public QueryBooleanValueExpression ParenthesizedBooleanExpression() throws ParseException {
+  QueryBooleanValueExpression x;
     jj_consume_token(LEFT_PAREN);
-    BooleanValueExpression();
+    x = BooleanValueExpression();
     jj_consume_token(RIGHT_PAREN);
+    {if (true) return x;}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void Predicate() throws ParseException {
+  final public QueryPredicate Predicate() throws ParseException {
+  QueryNullPredicate np;
+  QueryComparisonPredicate cp;
     if (jj_2_2(4)) {
-      NullPredicate();
+      np = NullPredicate();
+    {if (true) return np;}
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LEGAL_IDENTIFIER:
       case CHAR_STRING:
       case INT_VALUE:
       case DATE_VALUE:
-        ComparisonPredicate();
+        cp = ComparisonPredicate();
+    {if (true) return cp;}
         break;
       default:
         jj_la1[19] = jj_gen;
@@ -555,29 +583,42 @@ public class Parser implements ParserConstants {
         throw new ParseException();
       }
     }
+    throw new Error("Missing return statement in function");
   }
 
-  final public void ComparisonPredicate() throws ParseException {
-    CompOperand();
-    jj_consume_token(COMP_OP);
-    CompOperand();
+  final public QueryComparisonPredicate ComparisonPredicate() throws ParseException {
+  QueryComparisonPredicate p = new QueryComparisonPredicate();
+  Token t;
+    CompOperand(p, true);
+    t = jj_consume_token(COMP_OP);
+    p.setOperator(t.image);
+    CompOperand(p, false);
+    {if (true) return p;}
+    throw new Error("Missing return statement in function");
   }
 
-  final public void CompOperand() throws ParseException {
+  final public void CompOperand(QueryComparisonPredicate p, boolean left) throws ParseException {
+  QueryComparableValue value;
+  String tableName, columnName;
+  QueryComparableOperand operand = new QueryComparableOperand();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case CHAR_STRING:
     case INT_VALUE:
     case DATE_VALUE:
-      ComparableValue();
+      value = ComparableValue();
+    if(left) p.setLhsValue(value); else p.setRhsValue(value);
       break;
     case LEGAL_IDENTIFIER:
       if (jj_2_3(2)) {
-        LegalIdentifier();
+        tableName = LegalIdentifier();
+      operand.setTableName(tableName);
         jj_consume_token(PERIOD);
       } else {
         ;
       }
-      LegalIdentifier();
+      columnName = LegalIdentifier();
+    operand.setColumnName(columnName);
+    if(left) p.setLhsOperand(operand); else p.setRhsOperand(operand);
       break;
     default:
       jj_la1[20] = jj_gen;
@@ -613,15 +654,23 @@ public class Parser implements ParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public void NullPredicate() throws ParseException {
+  final public QueryNullPredicate NullPredicate() throws ParseException {
+  QueryNullPredicate p = new QueryNullPredicate();
+  String tableName, columnName;
+  QueryComparableOperand operand = new QueryComparableOperand();
     if (jj_2_4(2)) {
-      LegalIdentifier();
+      tableName = LegalIdentifier();
+      operand.setTableName(tableName);
       jj_consume_token(PERIOD);
     } else {
       ;
     }
-    LegalIdentifier();
+    columnName = LegalIdentifier();
+    operand.setColumnName(columnName);
     NullOperation();
+    p.setOperand(operand);
+    {if (true) return p;}
+    throw new Error("Missing return statement in function");
   }
 
   final public void NullOperation() throws ParseException {
@@ -807,6 +856,15 @@ public class Parser implements ParserConstants {
     finally { jj_save(3, xla); }
   }
 
+  private boolean jj_3R_10() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_4()) jj_scanpos = xsp;
+    if (jj_3R_9()) return true;
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
   private boolean jj_3_3() {
     if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
@@ -815,12 +873,6 @@ public class Parser implements ParserConstants {
 
   private boolean jj_3_2() {
     if (jj_3R_10()) return true;
-    return false;
-  }
-
-  private boolean jj_3_4() {
-    if (jj_3R_9()) return true;
-    if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 
@@ -833,12 +885,9 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3R_10() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_4()) jj_scanpos = xsp;
+  private boolean jj_3_1() {
     if (jj_3R_9()) return true;
-    if (jj_3R_11()) return true;
+    if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 
@@ -847,7 +896,7 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3_1() {
+  private boolean jj_3_4() {
     if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
     return false;

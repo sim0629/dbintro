@@ -472,80 +472,123 @@ QueryBooleanValueExpression WhereClause():
 }
 
 QueryBooleanValueExpression BooleanValueExpression():
-{}
 {
-  BooleanTerm()
+  QueryBooleanValueExpression x = new QueryBooleanValueExpression();
+  QueryBooleanTerm a;
+}
+{
+  a = BooleanTerm()
+  { x.add(a); }
   (
     < OR >
-    BooleanTerm()
+    a = BooleanTerm()
+    { x.add(a); }
   )*
-  { return new QueryBooleanValueExpression(); }
+  { return x; }
 }
 
-void BooleanTerm():
-{}
+QueryBooleanTerm BooleanTerm():
 {
-  BooleanFactor()
+  QueryBooleanTerm x = new QueryBooleanTerm();
+  QueryBooleanFactor a;
+}
+{
+  a = BooleanFactor()
+  { x.add(a); }
   (
     < AND >
-    BooleanFactor()
+    a = BooleanFactor()
+    { x.add(a); }
   )*
+  { return x; }
 }
 
-void BooleanFactor():
-{}
+QueryBooleanFactor BooleanFactor():
+{
+  QueryBooleanFactor x = new QueryBooleanFactor();
+  QueryBooleanTest t;
+}
 {
   (
     < NOT >
+    { x.setNot(true); }
   )?
-  BooleanTest()
+  t = BooleanTest()
+  { x.setTest(t); }
+  { return x; }
 }
 
-void BooleanTest():
-{}
+QueryBooleanTest BooleanTest():
 {
-  Predicate()
+  QueryPredicate p;
+  QueryBooleanValueExpression x;
+}
+{
+  p = Predicate()
+  { return p; }
 |
-  ParenthesizedBooleanExpression()
+  x = ParenthesizedBooleanExpression()
+  { return x; }
 }
 
-void ParenthesizedBooleanExpression():
-{}
+QueryBooleanValueExpression ParenthesizedBooleanExpression():
+{
+  QueryBooleanValueExpression x;
+}
 {
   < LEFT_PAREN >
-  BooleanValueExpression()
+  x = BooleanValueExpression()
   < RIGHT_PAREN >
+  { return x; }
 }
 
-void Predicate():
-{}
+QueryPredicate Predicate():
+{
+  QueryNullPredicate np;
+  QueryComparisonPredicate cp;
+}
 {
   // < IS >가 있는지 확인하기 위해 토큰 네개를 미리본다.
   LOOKAHEAD(4)
-  NullPredicate()
-| ComparisonPredicate()
+  np = NullPredicate()
+  { return np; }
+| cp = ComparisonPredicate()
+  { return cp; }
 }
 
-void ComparisonPredicate():
-{}
+QueryComparisonPredicate ComparisonPredicate():
 {
-  CompOperand()
-  < COMP_OP >
-  CompOperand()
+  QueryComparisonPredicate p = new QueryComparisonPredicate();
+  Token t;
+}
+{
+  CompOperand(p, true)
+  t = < COMP_OP >
+  { p.setOperator(t.image); }
+  CompOperand(p, false)
+  { return p; }
 }
 
-void CompOperand():
-{}
+void CompOperand(QueryComparisonPredicate p, boolean left):
 {
-  ComparableValue()
+  QueryComparableValue value;
+  String tableName, columnName;
+  QueryComparableOperand operand = new QueryComparableOperand();
+}
+{
+  value = ComparableValue()
+  { if(left) p.setLhsValue(value); else p.setRhsValue(value); }
 |
   (
     // < PERIOD >가 있는지 확인하기 위해 토큰 두개를 미리본다.
     LOOKAHEAD(2)
-    LegalIdentifier() // TABLE_NAME
+    tableName = LegalIdentifier()
+    { operand.setTableName(tableName); }
     < PERIOD >
   )?
-  LegalIdentifier() // COLUMN_NAME
+  columnName = LegalIdentifier()
+  { operand.setColumnName(columnName); }
+  { if(left) p.setLhsOperand(operand); else p.setRhsOperand(operand); }
 }
 
 QueryComparableValue ComparableValue():
@@ -567,17 +610,27 @@ QueryComparableValue ComparableValue():
   { return value; }
 }
 
-void NullPredicate():
-{}
+QueryNullPredicate NullPredicate():
+{
+  QueryNullPredicate p = new QueryNullPredicate();
+  String tableName, columnName;
+  QueryComparableOperand operand = new QueryComparableOperand();
+}
 {
   (
     // < PERIOD >가 있는지 확인하기 위해 토큰 두개를 미리본다.
     LOOKAHEAD(2)
-    LegalIdentifier() // TABLE_NAME
+    tableName = LegalIdentifier()
+    { operand.setTableName(tableName); }
     < PERIOD >
   )?
-  LegalIdentifier() // COLUMN_NAME
+  columnName = LegalIdentifier()
+  { operand.setColumnName(columnName); }
   NullOperation()
+  {
+    p.setOperand(operand);
+    return p;
+  }
 }
 
 void NullOperation():
