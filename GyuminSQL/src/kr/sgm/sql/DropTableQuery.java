@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import kr.sgm.sql.entity.*;
 
-class DropTableQuery extends BaseQuery implements IDefinitionQuery {
+class DropTableQuery extends BaseQuery {
   @Override
   final String getTypeString() {
     return "drop table";

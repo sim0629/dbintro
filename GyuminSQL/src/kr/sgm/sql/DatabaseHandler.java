@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import kr.sgm.sql.entity.Record;
+import kr.sgm.sql.entity.Table;
 
 class DatabaseHandler<K, T> {
   private static final File ENV_HOME = new File("db/");
@@ -38,6 +39,10 @@ class DatabaseHandler<K, T> {
 
   static DatabaseHandler tableHandler(String tableName) {
     return new DatabaseHandler(tableName, UUID.class, Record.class);
+  }
+
+  static DatabaseHandler infoHandler() {
+    return new DatabaseHandler("_info", String.class, Table.class);
   }
 
   private void open() {

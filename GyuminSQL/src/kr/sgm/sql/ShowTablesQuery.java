@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import kr.sgm.sql.entity.*;
 
-class ShowTablesQuery extends BaseQuery implements IDefinitionQuery {
+class ShowTablesQuery extends BaseQuery {
   @Override
   final String getTypeString() {
     return "show tables";

@@ -5,7 +5,7 @@ import java.util.HashSet;
 
 import kr.sgm.sql.entity.*;
 
-class CreateTableQuery extends BaseQuery implements IDefinitionQuery {
+class CreateTableQuery extends BaseQuery {
   @Override
   final String getTypeString() {
     return "create table";

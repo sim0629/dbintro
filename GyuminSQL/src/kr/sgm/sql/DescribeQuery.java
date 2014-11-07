@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import kr.sgm.sql.entity.*;
 
-class DescribeQuery extends BaseQuery implements IDefinitionQuery {
+class DescribeQuery extends BaseQuery {
   @Override
   final String getTypeString() {
     return "desc";
