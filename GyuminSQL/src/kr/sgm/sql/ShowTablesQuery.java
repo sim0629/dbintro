@@ -1,5 +1,7 @@
 package kr.sgm.sql;
 
+import java.util.ArrayList;
+
 import kr.sgm.sql.entity.*;
 
 class ShowTablesQuery extends BaseQuery implements IDefinitionQuery {
@@ -10,13 +12,20 @@ class ShowTablesQuery extends BaseQuery implements IDefinitionQuery {
 
   @Override
   void run() throws InvalidQueryException {
-    System.out.println("-----------------------");
-    for(Table table : infoHandler.all()) {
-      String tableName = table.getName();
-      if(tableName.length() > 23)
-        tableName = tableName.substring(0, 20) + "...";
-      System.out.printf("%-23s\n", tableName);
+    ArrayList<Table> tables = infoHandler.all();
+    if(tables.size() == 0) {
+      System.out.println(Messages.ShowTablesNoTable);
+      return;
     }
-    System.out.println("-----------------------");
+
+    ArrayList<ArrayList<Object>> rows = new ArrayList<ArrayList<Object>>(tables.size());
+    for(Table table : tables) {
+      ArrayList<Object> row = new ArrayList<Object>(1);
+      String tableName = table.getName();
+      row.add(tableName);
+      rows.add(row);
+    }
+
+    PrettyPrinter.print(rows, false);
   }
 }
