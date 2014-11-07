@@ -615,6 +615,7 @@ QueryNullPredicate NullPredicate():
   QueryNullPredicate p = new QueryNullPredicate();
   String tableName, columnName;
   QueryComparableOperand operand = new QueryComparableOperand();
+  boolean not;
 }
 {
   (
@@ -626,21 +627,26 @@ QueryNullPredicate NullPredicate():
   )?
   columnName = LegalIdentifier()
   { operand.setColumnName(columnName); }
-  NullOperation()
+  not = NullOperation()
   {
     p.setOperand(operand);
+    p.setNot(not);
     return p;
   }
 }
 
-void NullOperation():
-{}
+boolean NullOperation():
+{
+  boolean not = false;
+}
 {
   < IS >
   (
     < NOT >
+    { not = true; }
   )?
   < NULL >
+  { return not; }
 }
 
 InsertQuery Insert():

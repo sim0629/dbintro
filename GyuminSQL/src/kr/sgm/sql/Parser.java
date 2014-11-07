@@ -658,6 +658,7 @@ public class Parser implements ParserConstants {
   QueryNullPredicate p = new QueryNullPredicate();
   String tableName, columnName;
   QueryComparableOperand operand = new QueryComparableOperand();
+  boolean not;
     if (jj_2_4(2)) {
       tableName = LegalIdentifier();
       operand.setTableName(tableName);
@@ -667,23 +668,28 @@ public class Parser implements ParserConstants {
     }
     columnName = LegalIdentifier();
     operand.setColumnName(columnName);
-    NullOperation();
+    not = NullOperation();
     p.setOperand(operand);
+    p.setNot(not);
     {if (true) return p;}
     throw new Error("Missing return statement in function");
   }
 
-  final public void NullOperation() throws ParseException {
+  final public boolean NullOperation() throws ParseException {
+  boolean not = false;
     jj_consume_token(IS);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NOT:
       jj_consume_token(NOT);
+      not = true;
       break;
     default:
       jj_la1[22] = jj_gen;
       ;
     }
     jj_consume_token(NULL);
+    {if (true) return not;}
+    throw new Error("Missing return statement in function");
   }
 
   final public InsertQuery Insert() throws ParseException {
@@ -856,12 +862,26 @@ public class Parser implements ParserConstants {
     finally { jj_save(3, xla); }
   }
 
+  private boolean jj_3R_11() {
+    if (jj_scan_token(IS)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_12()) jj_scanpos = xsp;
+    if (jj_scan_token(NULL)) return true;
+    return false;
+  }
+
   private boolean jj_3R_10() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_4()) jj_scanpos = xsp;
     if (jj_3R_9()) return true;
     if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_9() {
+    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
     return false;
   }
 
@@ -876,23 +896,14 @@ public class Parser implements ParserConstants {
     return false;
   }
 
-  private boolean jj_3R_11() {
-    if (jj_scan_token(IS)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(10)) jj_scanpos = xsp;
-    if (jj_scan_token(NULL)) return true;
-    return false;
-  }
-
   private boolean jj_3_1() {
     if (jj_3R_9()) return true;
     if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 
-  private boolean jj_3R_9() {
-    if (jj_scan_token(LEGAL_IDENTIFIER)) return true;
+  private boolean jj_3R_12() {
+    if (jj_scan_token(NOT)) return true;
     return false;
   }
 
