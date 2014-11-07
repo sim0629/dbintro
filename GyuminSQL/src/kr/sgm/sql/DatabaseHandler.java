@@ -117,4 +117,17 @@ class DatabaseHandler<K, T> {
       close();
     }
   }
+
+  // 모든 entity를 지우고 성공 여부를 반환한다.
+  boolean truncate() {
+    open();
+    try {
+      store.truncateClass(entityType);
+      return true;
+    }catch(DatabaseException ex) {
+      return false;
+    }finally {
+      close();
+    }
+  }
 }

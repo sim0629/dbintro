@@ -1,5 +1,7 @@
 package kr.sgm.sql;
 
+import java.util.UUID;
+
 import kr.sgm.sql.entity.*;
 
 class DropTableQuery extends BaseQuery implements IDefinitionQuery {
@@ -29,6 +31,10 @@ class DropTableQuery extends BaseQuery implements IDefinitionQuery {
     }
 
     infoHandler.remove(this.tableName);
+
+    DatabaseHandler<UUID, Record> tableHandler = DatabaseHandler.tableHandler(this.tableName);
+    tableHandler.truncate();
+
     System.out.printf(Messages.DropSuccessS, this.tableName);
     System.out.println("");
   }
