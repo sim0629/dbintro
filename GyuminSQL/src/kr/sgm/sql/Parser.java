@@ -828,8 +828,9 @@ public class Parser implements ParserConstants {
     try {
       {if (true) return dateFormat.parse(t.image);}
     }catch(java.text.ParseException ex) {
-      // 자체 ParseException으로 바꾸어 던진다.
-      {if (true) throw new ParseException();}
+      // 날짜 범위가 잘못되면 null을 리턴한다.
+      // BaseQuery.run에서 예외를 잘 발생해줘야 한다.
+      {if (true) return null;}
     }
     throw new Error("Missing return statement in function");
   }
