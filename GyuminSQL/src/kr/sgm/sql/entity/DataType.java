@@ -11,6 +11,22 @@ public final class DataType {
   private int type;
   private int capacity;
 
+  public boolean isInt() {
+    return type == INT;
+  }
+
+  public boolean isChar() {
+    return type == CHAR;
+  }
+
+  public boolean isDate() {
+    return type == DATE;
+  }
+
+  public int getLength() {
+    return capacity;
+  }
+
   public static DataType createInt() {
     DataType t = new DataType();
     t.type = INT;

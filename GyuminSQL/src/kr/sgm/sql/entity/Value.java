@@ -30,4 +30,16 @@ public final class Value {
   public Date getDate() {
     return this.d;
   }
+
+  public static boolean same(DataType type, Value x, Value y) {
+    if(type.isInt()) {
+      return x.i == y.i;
+    }else if(type.isChar()) {
+      return x.s.equals(y.s);
+    }else if(type.isDate()) {
+      return x.d.equals(y.d);
+    }else {
+      throw new IllegalStateException();
+    }
+  }
 }
