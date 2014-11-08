@@ -1,7 +1,5 @@
 package kr.sgm.sql;
 
-import java.util.UUID;
-
 import kr.sgm.sql.entity.*;
 
 class DropTableQuery extends BaseQuery {
@@ -32,7 +30,7 @@ class DropTableQuery extends BaseQuery {
 
     infoHandler.remove(this.tableName);
 
-    DatabaseHandler<UUID, Record> tableHandler = DatabaseHandler.tableHandler(this.tableName);
+    DatabaseHandler<String, Record> tableHandler = DatabaseHandler.tableHandler(this.tableName);
     tableHandler.truncate();
 
     System.out.printf(Messages.DropSuccessS, this.tableName);

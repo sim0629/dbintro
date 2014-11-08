@@ -10,7 +10,6 @@ import com.sleepycat.persist.StoreConfig;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import kr.sgm.sql.entity.Record;
 import kr.sgm.sql.entity.Table;
@@ -38,7 +37,7 @@ class DatabaseHandler<K, T> {
   }
 
   static DatabaseHandler tableHandler(String tableName) {
-    return new DatabaseHandler(tableName, UUID.class, Record.class);
+    return new DatabaseHandler(tableName, String.class, Record.class);
   }
 
   static DatabaseHandler infoHandler() {

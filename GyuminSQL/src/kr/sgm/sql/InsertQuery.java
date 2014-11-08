@@ -31,12 +31,12 @@ class InsertQuery extends BaseQuery {
 
   @Override
   void run() throws InvalidQueryException {
-    DatabaseHandler<UUID, Record> tableHandler = DatabaseHandler.tableHandler(tableName);
+    DatabaseHandler<String, Record> tableHandler = DatabaseHandler.tableHandler(tableName);
     tableHandler.save(makeRecord(tableHandler));
     System.out.println(Messages.InsertResult);
   }
 
-  Record makeRecord(DatabaseHandler<UUID, Record> tableHandler) throws InvalidQueryException {
+  Record makeRecord(DatabaseHandler<String, Record> tableHandler) throws InvalidQueryException {
     Table table = infoHandler.load(tableName);
     if(table == null)
       throw new InvalidQueryException(Messages.NoSuchTable);
@@ -114,7 +114,7 @@ class InsertQuery extends BaseQuery {
       String refTableName = entry1.getKey();
       HashMap<Integer, String> foreignKeyIndexes = entry1.getValue();
       ArrayList<Column> refTableColumns = infoHandler.load(refTableName).getColumns();
-      DatabaseHandler<UUID, Record> refTableHandler = DatabaseHandler.tableHandler(refTableName);
+      DatabaseHandler<String, Record> refTableHandler = DatabaseHandler.tableHandler(refTableName);
       for(Record record : refTableHandler.all()) {
         ArrayList<Value> vs = record.getValues();
         boolean allSame = true;
@@ -143,7 +143,7 @@ class InsertQuery extends BaseQuery {
     }
 
     Record record = new Record();
-    record.setUID(UUID.randomUUID());
+    record.setUID(UUID.randomUUID().toString());
     record.setValues(recordValues);
     return record;
   }

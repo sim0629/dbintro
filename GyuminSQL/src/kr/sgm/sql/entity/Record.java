@@ -4,18 +4,17 @@ import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 @Entity
 public final class Record {
   @PrimaryKey
-  private UUID uid;
+  private String uid;
   private ArrayList<Value> values = new ArrayList<Value>();
 
-  public UUID getUID() {
+  public String getUID() {
     return this.uid;
   }
-  public void setUID(UUID uid) {
+  public void setUID(String uid) {
     this.uid = uid;
   }
 
