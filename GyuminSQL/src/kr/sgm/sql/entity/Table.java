@@ -25,4 +25,12 @@ public final class Table {
     this.columns.clear();
     this.columns.addAll(columns);
   }
+
+  public boolean isForeignKeyNullable() {
+    for(Column column : columns) {
+      if(column.getIsForeignKey() && !column.getNullable())
+        return false;
+    }
+    return true;
+  }
 }

@@ -25,4 +25,7 @@ public final class Record {
     this.values.clear();
     this.values.addAll(values);
   }
+  public void setValue(int index, Value value) {
+    this.values.set(index, value);
+  }
 }
