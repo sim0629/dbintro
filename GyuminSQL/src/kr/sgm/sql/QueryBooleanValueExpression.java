@@ -16,7 +16,7 @@ final class QueryBooleanValueExpression extends QueryBooleanTest {
   }
 
   @Override
-  public boolean check(ArrayList<QueryReferedTable> referedTables, ArrayList<Record> records)
+  public boolean check(ArrayList<QueryReferedTable> referedTables, ArrayList<Table> tables, ArrayList<Record> records)
     throws InvalidQueryException {
     throw new InvalidQueryException("not implemented");
   }

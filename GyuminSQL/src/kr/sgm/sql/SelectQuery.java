@@ -35,9 +35,22 @@ class SelectQuery extends BaseQuery {
 
   @Override
   void run() throws InvalidQueryException {
+    ArrayList<Table> tables = getTables();
     checkDuplicateAlias();
     ArrayList<ArrayList<Record>> metaRecords = getMetaRecords();
-    allCombinations(metaRecords, new ArrayList<Record>());
+    allCombinations(tables, metaRecords, new ArrayList<Record>());
+  }
+
+  ArrayList<Table> getTables() throws InvalidQueryException {
+    ArrayList<Table> tables = new ArrayList<Table>();
+    for(QueryReferedTable referedTable : referedTables) {
+      String tableName = referedTable.getTableName();
+      Table table = infoHandler.load(tableName);
+      if(table == null)
+        throw new InvalidQueryException(String.format(Messages.SelectTableExistenceErrorS, tableName));
+      tables.add(table);
+    }
+    return tables;
   }
 
   // 같은 effectiveName이 있으면 DuplicateAliasError를 낸다.
@@ -51,20 +64,20 @@ class SelectQuery extends BaseQuery {
     }
   }
 
-  void checkWhereCondition(ArrayList<Record> records) throws InvalidQueryException {
-    if(where == null || where.check(referedTables, records)) {
+  void checkWhereCondition(ArrayList<Table> tables, ArrayList<Record> records) throws InvalidQueryException {
+    if(where == null || where.check(referedTables, tables, records)) {
       // it's selected!
     }
   }
 
-  void allCombinations(List<ArrayList<Record>> metaRecords, ArrayList<Record> combination) throws InvalidQueryException {
+  void allCombinations(ArrayList<Table> tables, List<ArrayList<Record>> metaRecords, ArrayList<Record> combination) throws InvalidQueryException {
     if(metaRecords.size() == 0) {
-      checkWhereCondition(combination);
+      checkWhereCondition(tables, combination);
     }else {
       for(Record record : metaRecords.get(0)) {
         ArrayList<Record> newCombination = new ArrayList<Record>(combination);
         newCombination.add(record);
-        allCombinations(metaRecords.subList(1, metaRecords.size()), newCombination);
+        allCombinations(tables, metaRecords.subList(1, metaRecords.size()), newCombination);
       }
     }
   }
@@ -74,8 +87,6 @@ class SelectQuery extends BaseQuery {
     for(QueryReferedTable referedTable : referedTables) {
       String tableName = referedTable.getTableName();
       DatabaseHandler<String, Record> tableHandler = DatabaseHandler.tableHandler(tableName);
-      if(tableHandler == null)
-        throw new InvalidQueryException(String.format(Messages.SelectTableExistenceErrorS, tableName));
       metaRecords.add(tableHandler.all());
     }
     return metaRecords;
