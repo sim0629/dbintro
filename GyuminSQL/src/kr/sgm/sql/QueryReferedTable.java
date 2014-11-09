@@ -16,4 +16,12 @@ final class QueryReferedTable {
   String getAlias() {
     return this.alias;
   }
+
+  // alias가 있으면 그것,
+  // 아니면 tableName이다.
+  String getEffectiveName() {
+    if(this.alias != null)
+      return this.alias;
+    return this.tableName;
+  }
 }

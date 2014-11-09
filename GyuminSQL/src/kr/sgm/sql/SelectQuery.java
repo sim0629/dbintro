@@ -35,8 +35,20 @@ class SelectQuery extends BaseQuery {
 
   @Override
   void run() throws InvalidQueryException {
+    checkDuplicateAlias();
     ArrayList<ArrayList<Record>> metaRecords = getMetaRecords();
     allCombinations(metaRecords, new ArrayList<Record>());
+  }
+
+  // 같은 effectiveName이 있으면 DuplicateAliasError를 낸다.
+  // effectiveName은 QueryReferedTable.java 참조
+  void checkDuplicateAlias() throws InvalidQueryException {
+    ArrayList<String> names = new ArrayList<String>();
+    for(QueryReferedTable referedTable : referedTables) {
+      String effectiveName = referedTable.getEffectiveName();
+      if(names.contains(effectiveName))
+        throw new InvalidQueryException(Messages.SelectDuplicateAliasingError);
+    }
   }
 
   void checkWhereCondition(ArrayList<Record> records) throws InvalidQueryException {
