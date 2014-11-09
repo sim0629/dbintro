@@ -4,6 +4,8 @@ import com.sleepycat.persist.model.Persistent;
 
 import java.util.Date;
 
+import kr.sgm.sql.DateFormatHolder;
+
 @Persistent
 public final class Value {
   private int i;
@@ -46,7 +48,7 @@ public final class Value {
   @Override
   public String toString() {
     if(this.d != null)
-      return this.d.toString();
+      return DateFormatHolder.format(this.d);
     else if(this.s != null)
       return this.s.toString();
     else

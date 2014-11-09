@@ -48,15 +48,6 @@ public class Parser implements ParserConstants {
     return Keywords.contains(identifier);
   }
 
-  private static java.text.SimpleDateFormat dateFormat =
-    new java.text.SimpleDateFormat("yyyy-MM-dd");
-
-  static {
-    // 형식이 잘못된 입력에 대해 parse할 때
-    // ParseException을 내도록 설정 한다.
-    dateFormat.setLenient(false);
-  }
-
   final public boolean Parse(ArrayList<BaseQuery> results) throws ParseException {
   boolean exit;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -826,7 +817,7 @@ public class Parser implements ParserConstants {
   Token t;
     t = jj_consume_token(DATE_VALUE);
     try {
-      {if (true) return dateFormat.parse(t.image);}
+      {if (true) return DateFormatHolder.parse(t.image);}
     }catch(java.text.ParseException ex) {
       // 날짜 범위가 잘못되면 null을 리턴한다.
       // BaseQuery.run에서 예외를 잘 발생해줘야 한다.
