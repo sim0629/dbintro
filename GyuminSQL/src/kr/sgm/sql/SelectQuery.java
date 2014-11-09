@@ -34,17 +34,11 @@ class SelectQuery extends BaseQuery {
     this.where = where;
   }
 
-  private ArrayList<ArrayList<Record>> selectedRecordsList = new ArrayList<ArrayList<Record>>();
+  ArrayList<ArrayList<Record>> selectedRecordsList = new ArrayList<ArrayList<Record>>();
 
   @Override
   void run() throws InvalidQueryException {
-    selectedRecordsList.clear();
-    ArrayList<Table> tables = getTables();
-    checkDuplicateAlias();
-    if(isSelectingAll()) prepareSelectedColumnsForAll(tables);
-    ArrayList<TableAndColumnIndex> selectedColumnIndexes = getSelectedColumnIndexes(tables);
-    ArrayList<ArrayList<Record>> metaRecords = getMetaRecords();
-    allCombinations(tables, metaRecords, new ArrayList<Record>());
+    ArrayList<TableAndColumnIndex> selectedColumnIndexes = dryRun();
 
     ArrayList<ArrayList<Object>> out = new ArrayList<ArrayList<Object>>();
 
@@ -64,6 +58,17 @@ class SelectQuery extends BaseQuery {
     }
 
     PrettyPrinter.print(out, true);
+  }
+
+  ArrayList<TableAndColumnIndex> dryRun() throws InvalidQueryException {
+    selectedRecordsList.clear();
+    ArrayList<Table> tables = getTables();
+    checkDuplicateAlias();
+    if(isSelectingAll()) prepareSelectedColumnsForAll(tables);
+    ArrayList<TableAndColumnIndex> selectedColumnIndexes = getSelectedColumnIndexes(tables);
+    ArrayList<ArrayList<Record>> metaRecords = getMetaRecords();
+    allCombinations(tables, metaRecords, new ArrayList<Record>());
+    return selectedColumnIndexes;
   }
 
   void prepareSelectedColumnsForAll(ArrayList<Table> tables) {
