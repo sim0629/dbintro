@@ -36,12 +36,12 @@ class DatabaseHandler<K, T> {
     this.entityType = entityType;
   }
 
-  static DatabaseHandler tableHandler(String tableName) {
-    return new DatabaseHandler(tableName, String.class, Record.class);
+  static DatabaseHandler<String, Record> tableHandler(String tableName) {
+    return new DatabaseHandler<String, Record>(tableName, String.class, Record.class);
   }
 
-  static DatabaseHandler infoHandler() {
-    return new DatabaseHandler("_info", String.class, Table.class);
+  static DatabaseHandler<String, Table> infoHandler() {
+    return new DatabaseHandler<String, Table>("_info", String.class, Table.class);
   }
 
   private void open() {
