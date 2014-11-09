@@ -18,6 +18,12 @@ final class QueryBooleanValueExpression extends QueryBooleanTest {
   @Override
   public Boolean check(ArrayList<QueryReferedTable> referedTables, ArrayList<Table> tables, ArrayList<Record> records)
     throws InvalidQueryException {
-    throw new InvalidQueryException("not implemented");
+    Boolean r = false;
+    for(QueryBooleanTerm x : or) {
+      Boolean b = x.check(referedTables, tables, records);
+      if(b == null) r = null;
+      else if(b) return true;
+    }
+    return r;
   }
 }

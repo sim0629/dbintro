@@ -17,6 +17,12 @@ final class QueryBooleanTerm implements IWhereClause {
 
   public Boolean check(ArrayList<QueryReferedTable> referedTables, ArrayList<Table> tables, ArrayList<Record> records)
     throws InvalidQueryException {
-    throw new InvalidQueryException("not implemented");
+    Boolean r = true;
+    for(QueryBooleanFactor x : and) {
+      Boolean b = x.check(referedTables, tables, records);
+      if(b == null) r = null;
+      else if(!b) return false;
+    }
+    return r;
   }
 }

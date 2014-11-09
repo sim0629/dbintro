@@ -27,6 +27,10 @@ final class QueryNullPredicate extends QueryPredicate {
   @Override
   public Boolean check(ArrayList<QueryReferedTable> referedTables, ArrayList<Table> tables, ArrayList<Record> records)
     throws InvalidQueryException {
-    throw new InvalidQueryException("not implemented");
+    Value value = resolveOperand(operand, referedTables, tables, records).value;
+    if(not)
+      return value != null;
+    else
+      return value == null;
   }
 }

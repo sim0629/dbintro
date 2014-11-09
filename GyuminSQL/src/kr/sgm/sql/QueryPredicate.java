@@ -6,7 +6,7 @@ import kr.sgm.sql.entity.*;
 
 abstract class QueryPredicate extends QueryBooleanTest {
   // QueryComparableOperand를 가지고 Value를 얻어오기
-  protected Value resolveOperand(
+  protected ValueAndType resolveOperand(
     QueryComparableOperand operand,
     ArrayList<QueryReferedTable> referedTables,
     ArrayList<Table> tables,
@@ -31,7 +31,10 @@ abstract class QueryPredicate extends QueryBooleanTest {
           }
         }
       }
-      return records.get(theI).getValues().get(theJ);
+      return new ValueAndType(
+        records.get(theI).getValues().get(theJ),
+        tables.get(theI).getColumns().get(theJ).getDataType()
+      );
     }else {
       int i;
       for(i = 0; i < referedTables.size(); i++) {
@@ -50,7 +53,10 @@ abstract class QueryPredicate extends QueryBooleanTest {
       }
       if(j == columns.size())
         throw new InvalidQueryException(Messages.WhereColumnNotExist);
-      return records.get(i).getValues().get(j);
+      return new ValueAndType(
+        records.get(i).getValues().get(j),
+        tables.get(i).getColumns().get(j).getDataType()
+      );
     }
   }
 }

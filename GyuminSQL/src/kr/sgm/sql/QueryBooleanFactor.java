@@ -26,6 +26,9 @@ final class QueryBooleanFactor implements IWhereClause {
 
   public Boolean check(ArrayList<QueryReferedTable> referedTables, ArrayList<Table> tables, ArrayList<Record> records)
     throws InvalidQueryException {
-    throw new InvalidQueryException("not implemented");
+    Boolean b = test.check(referedTables, tables, records);
+    if(b == null) return null;
+    if(not) return !b;
+    else return b;
   }
 }

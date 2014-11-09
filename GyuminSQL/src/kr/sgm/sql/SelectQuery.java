@@ -65,7 +65,7 @@ class SelectQuery extends BaseQuery {
   }
 
   void checkWhereCondition(ArrayList<Table> tables, ArrayList<Record> records) throws InvalidQueryException {
-    Boolean t = new Boolean(true);
+    Boolean t = true;
     if(where == null || t.equals(where.check(referedTables, tables, records))) {
       // it's selected!
     }
