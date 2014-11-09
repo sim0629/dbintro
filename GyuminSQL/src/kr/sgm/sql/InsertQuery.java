@@ -93,20 +93,22 @@ class InsertQuery extends BaseQuery {
 
     // primary key constraint check
     ArrayList<Integer> primaryKeyIndexes = getPrimaryKeyIndexes(columns);
-    for(Record record : tableHandler.all()) {
-      ArrayList<Value> vs = record.getValues();
-      boolean allSame = true;
-      for(Integer primaryKeyIndex : primaryKeyIndexes) {
-        if(!Value.same(
-          columns.get(primaryKeyIndex).getDataType(),
-          recordValues.get(primaryKeyIndex),
-          vs.get(primaryKeyIndex))) {
-          allSame = false;
-          break;
+    if(primaryKeyIndexes.size() > 0) {
+      for(Record record : tableHandler.all()) {
+        ArrayList<Value> vs = record.getValues();
+        boolean allSame = true;
+        for(Integer primaryKeyIndex : primaryKeyIndexes) {
+          if(!Value.same(
+            columns.get(primaryKeyIndex).getDataType(),
+            recordValues.get(primaryKeyIndex),
+            vs.get(primaryKeyIndex))) {
+            allSame = false;
+            break;
+          }
         }
+        if(allSame)
+          throw new InvalidQueryException(Messages.InsertDuplicatePrimaryKeyError);
       }
-      if(allSame)
-        throw new InvalidQueryException(Messages.InsertDuplicatePrimaryKeyError);
     }
 
     // foreign key constraints check
