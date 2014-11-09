@@ -25,7 +25,7 @@ final class QueryNullPredicate extends QueryPredicate {
   }
 
   @Override
-  public boolean check(ArrayList<QueryReferedTable> referedTables, ArrayList<Table> tables, ArrayList<Record> records)
+  public Boolean check(ArrayList<QueryReferedTable> referedTables, ArrayList<Table> tables, ArrayList<Record> records)
     throws InvalidQueryException {
     throw new InvalidQueryException("not implemented");
   }
