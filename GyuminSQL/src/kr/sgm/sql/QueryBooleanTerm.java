@@ -2,7 +2,9 @@ package kr.sgm.sql;
 
 import java.util.ArrayList;
 
-final class QueryBooleanTerm {
+import kr.sgm.sql.entity.*;
+
+final class QueryBooleanTerm implements IWhereClause {
   private ArrayList<QueryBooleanFactor> and = new ArrayList<QueryBooleanFactor>();
 
   void add(QueryBooleanFactor x) {
@@ -11,5 +13,10 @@ final class QueryBooleanTerm {
 
   ArrayList<QueryBooleanFactor> get() {
     return and;
+  }
+
+  public boolean check(ArrayList<QueryReferedTable> referedTables, ArrayList<Record> records)
+    throws InvalidQueryException {
+    throw new InvalidQueryException("not implemented");
   }
 }

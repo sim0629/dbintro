@@ -39,9 +39,15 @@ class SelectQuery extends BaseQuery {
     allCombinations(metaRecords, new ArrayList<Record>());
   }
 
-  void allCombinations(List<ArrayList<Record>> metaRecords, ArrayList<Record> combination) {
+  void checkWhereCondition(ArrayList<Record> records) throws InvalidQueryException {
+    if(where == null || where.check(referedTables, records)) {
+      // it's selected!
+    }
+  }
+
+  void allCombinations(List<ArrayList<Record>> metaRecords, ArrayList<Record> combination) throws InvalidQueryException {
     if(metaRecords.size() == 0) {
-      //doSomethingWithCombination
+      checkWhereCondition(combination);
     }else {
       for(Record record : metaRecords.get(0)) {
         ArrayList<Record> newCombination = new ArrayList<Record>(combination);

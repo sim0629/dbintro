@@ -1,5 +1,9 @@
 package kr.sgm.sql;
 
+import java.util.ArrayList;
+
+import kr.sgm.sql.entity.*;
+
 final class QueryComparisonPredicate extends QueryPredicate {
   private QueryComparableValue lhsValue;
   private QueryComparableOperand lhsOperand;
@@ -45,5 +49,11 @@ final class QueryComparisonPredicate extends QueryPredicate {
 
   String getOperator() {
     return this.op;
+  }
+
+  @Override
+  public boolean check(ArrayList<QueryReferedTable> referedTables, ArrayList<Record> records)
+    throws InvalidQueryException {
+    throw new InvalidQueryException("not implemented");
   }
 }
