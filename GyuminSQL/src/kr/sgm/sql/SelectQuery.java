@@ -1,6 +1,7 @@
 package kr.sgm.sql;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import kr.sgm.sql.entity.*;
@@ -40,8 +41,74 @@ class SelectQuery extends BaseQuery {
     selectedRecordsList.clear();
     ArrayList<Table> tables = getTables();
     checkDuplicateAlias();
+    if(isSelectingAll()) prepareSelectedColumnsForAll(tables);
+    ArrayList<TableAndColumnIndex> selectedColumnIndexes = getSelectedColumnIndexes(tables);
     ArrayList<ArrayList<Record>> metaRecords = getMetaRecords();
     allCombinations(tables, metaRecords, new ArrayList<Record>());
+
+    ArrayList<ArrayList<Object>> out = new ArrayList<ArrayList<Object>>();
+
+    ArrayList<Object> header = new ArrayList<Object>();
+    for(int i = 0; i < selectedColumns.size(); i++) {
+      QuerySelectedColumn qsc = selectedColumns.get(i);
+      header.add(qsc.getTitle());
+    }
+    out.add(header);
+
+    for(ArrayList<Record> selectedRecords : selectedRecordsList) {
+      ArrayList<Object> row = new ArrayList<Object>();
+      for(TableAndColumnIndex index : selectedColumnIndexes) {
+        row.add(selectedRecords.get(index.ti).getValues().get(index.ci));
+      }
+      out.add(row);
+    }
+
+    PrettyPrinter.print(out, true);
+  }
+
+  void prepareSelectedColumnsForAll(ArrayList<Table> tables) {
+    HashMap<String, Integer> nofColumnNames = new HashMap<String, Integer>();
+    int i = 0;
+    for(Table table : tables) {
+      for(Column column : table.getColumns()) {
+        String columnName = column.getName();
+        Integer n = 0;
+        if(nofColumnNames.containsKey(columnName))
+          n = nofColumnNames.get(columnName);
+        nofColumnNames.put(columnName, n + 1);
+        QuerySelectedColumn qsc = new QuerySelectedColumn(referedTables.get(i).getEffectiveName(), columnName, null);
+        selectedColumns.add(qsc);
+      }
+      i++;
+    }
+    for(QuerySelectedColumn qsc : selectedColumns) {
+      String columnName = qsc.getColumnName();
+      if(nofColumnNames.get(columnName) == 1)
+        qsc.setTableName(null);
+    }
+  }
+
+  ArrayList<TableAndColumnIndex> getSelectedColumnIndexes(ArrayList<Table> tables) throws InvalidQueryException {
+    ArrayList<TableAndColumnIndex> indexes = new ArrayList<TableAndColumnIndex>();
+    for(QuerySelectedColumn qsc : selectedColumns) {
+      String tableName = qsc.getTableName();
+      String columnName = qsc.getColumnName();
+      boolean added = false;
+      for(int i = 0; i < referedTables.size(); i++) {
+        if(tableName == null || referedTables.get(i).getEffectiveName().equals(tableName)) {
+          ArrayList<Column> columns = tables.get(i).getColumns();
+          for(int j = 0; j < columns.size(); j++) {
+            if(columns.get(j).getName().equals(columnName)) {
+              if(added)
+                throw new InvalidQueryException(String.format(Messages.SelectColumnResolveErrorS, columnName));
+              indexes.add(new TableAndColumnIndex(i, j));
+              added = true;
+            }
+          }
+        }
+      }
+    }
+    return indexes;
   }
 
   ArrayList<Table> getTables() throws InvalidQueryException {

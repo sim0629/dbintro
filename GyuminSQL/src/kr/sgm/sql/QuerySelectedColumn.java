@@ -11,6 +11,10 @@ final class QuerySelectedColumn {
     this.alias = alias;
   }
 
+  void setTableName(String tableName) {
+    this.tableName = tableName;
+  }
+
   String getTableName() {
     return this.tableName;
   }
@@ -21,5 +25,11 @@ final class QuerySelectedColumn {
 
   String getAlias() {
     return this.alias;
+  }
+
+  String getTitle() {
+    if(alias != null) return alias;
+    if(tableName == null) return columnName;
+    return tableName + "." + columnName;
   }
 }

@@ -42,4 +42,14 @@ public final class Value {
       throw new IllegalStateException();
     }
   }
+
+  @Override
+  public String toString() {
+    if(this.d != null)
+      return this.d.toString();
+    else if(this.s != null)
+      return this.s.toString();
+    else
+      return new Integer(this.i).toString();
+  }
 }

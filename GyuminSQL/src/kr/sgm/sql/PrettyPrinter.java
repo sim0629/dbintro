@@ -14,7 +14,7 @@ final class PrettyPrinter {
     for(ArrayList<Object> row : table) {
       int colIndex = 0;
       for(Object cell : row) {
-        int l = cell.toString().length();
+        int l = cell == null ? 4 : cell.toString().length();
         if(l > maxLengths[colIndex])
           maxLengths[colIndex] = l;
         colIndex++;
@@ -42,7 +42,7 @@ final class PrettyPrinter {
       System.out.print('|');
       for(Object cell : table.get(0)) {
         String format = String.format("%%-%ds", maxLengths[index]);
-        System.out.printf(format, cell.toString());
+        System.out.printf(format, cell == null ? "null" : cell.toString());
         System.out.print('|');
         index++;
       }
@@ -55,7 +55,7 @@ final class PrettyPrinter {
       System.out.print('|');
       for(Object cell : row) {
         String format = String.format("%%-%ds", maxLengths[index]);
-        System.out.printf(format, cell.toString());
+        System.out.printf(format, cell == null ? "null" : cell.toString());
         System.out.print('|');
         index++;
       }
