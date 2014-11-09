@@ -57,11 +57,13 @@ class SelectQuery extends BaseQuery {
     }
   }
 
-  ArrayList<ArrayList<Record>> getMetaRecords() {
+  ArrayList<ArrayList<Record>> getMetaRecords() throws InvalidQueryException {
     ArrayList<ArrayList<Record>> metaRecords = new ArrayList<ArrayList<Record>>();
     for(QueryReferedTable referedTable : referedTables) {
       String tableName = referedTable.getTableName();
       DatabaseHandler<String, Record> tableHandler = DatabaseHandler.tableHandler(tableName);
+      if(tableHandler == null)
+        throw new InvalidQueryException(String.format(Messages.SelectTableExistenceErrorS, tableName));
       metaRecords.add(tableHandler.all());
     }
     return metaRecords;
