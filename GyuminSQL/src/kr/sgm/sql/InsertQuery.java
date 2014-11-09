@@ -117,6 +117,7 @@ class InsertQuery extends BaseQuery {
       HashMap<Integer, String> foreignKeyIndexes = entry1.getValue();
       ArrayList<Column> refTableColumns = infoHandler.load(refTableName).getColumns();
       DatabaseHandler<String, Record> refTableHandler = DatabaseHandler.tableHandler(refTableName);
+      boolean exists = false;
       for(Record record : refTableHandler.all()) {
         ArrayList<Value> vs = record.getValues();
         boolean allSame = true;
@@ -139,9 +140,13 @@ class InsertQuery extends BaseQuery {
             break;
           }
         }
-        if(!allSame)
-          throw new InvalidQueryException(Messages.InsertReferentialIntegrityError);
+        if(allSame) {
+          exists = true;
+          break;
+        }
       }
+      if(!exists)
+        throw new InvalidQueryException(Messages.InsertReferentialIntegrityError);
     }
 
     Record record = new Record();
