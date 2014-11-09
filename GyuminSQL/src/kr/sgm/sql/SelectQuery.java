@@ -33,8 +33,11 @@ class SelectQuery extends BaseQuery {
     this.where = where;
   }
 
+  private ArrayList<ArrayList<Record>> selectedRecordsList = new ArrayList<ArrayList<Record>>();
+
   @Override
   void run() throws InvalidQueryException {
+    selectedRecordsList.clear();
     ArrayList<Table> tables = getTables();
     checkDuplicateAlias();
     ArrayList<ArrayList<Record>> metaRecords = getMetaRecords();
@@ -67,7 +70,7 @@ class SelectQuery extends BaseQuery {
   void checkWhereCondition(ArrayList<Table> tables, ArrayList<Record> records) throws InvalidQueryException {
     Boolean t = true;
     if(where == null || t.equals(where.check(referedTables, tables, records))) {
-      // it's selected!
+      selectedRecordsList.add(records);
     }
   }
 
