@@ -79,4 +79,11 @@ public final class Main {
     Scanner in = new Scanner(System.in);
     return in.nextInt();
   }
+
+  private static String scanString(String prompt) {
+    System.out.printf("%s: ", prompt);
+    @SuppressWarnings("resource")
+    Scanner in = new Scanner(System.in);
+    return in.nextLine();
+  }
 }
