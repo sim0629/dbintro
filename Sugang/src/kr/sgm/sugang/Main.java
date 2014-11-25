@@ -43,6 +43,7 @@ public final class Main {
       case 9:
         break;
       default:
+        // [1-9] 이외의 명령이 들어오면 종료
         exit = true;
         break;
       }
@@ -67,6 +68,7 @@ public final class Main {
     try {
       return in.nextInt();
     }catch(InputMismatchException ex) {
+      // 잘못된 입력이 들어오면 종료
       return 0;
     }
   }
