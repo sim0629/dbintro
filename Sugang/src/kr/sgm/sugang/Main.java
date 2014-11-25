@@ -19,12 +19,14 @@ public final class Main {
   private static String separator =
     "============================================";
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
+    QueryHandler h = new QueryHandler();
     boolean exit = false;
     while(!exit) {
       printMenu();
       switch(readCode()) {
       case 1:
+        h.listAllLectures();
         break;
       case 2:
         break;
