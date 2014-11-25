@@ -6,14 +6,16 @@ class QueryHandler {
   private static final String SQL_LIST_ALL_LECTURES =
     "SELECT id, name, credit, capacity, " +
     "(SELECT COUNT(*) FROM registration WHERE lecture_id = id) AS current_applied " +
-    "FROM lecture";
+    "FROM lecture " +
+    "ORDER BY id";
 
   private static final String SQL_LIST_ALL_STUDENTS =
     "SELECT student.id as id, student.name as name, " +
     "(SELECT NVL(SUM(credit), 0) " +
     " FROM registration JOIN lecture ON lecture_id = lecture.id " +
     " WHERE student_id = student.id) AS used_credits " +
-    "FROM student";
+    "FROM student " +
+    "ORDER BY student.id";
 
   private static final String SEP_LECTURES =
     "----------------------------------------------------------------------";
