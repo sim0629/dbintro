@@ -29,6 +29,7 @@ public final class Main {
         h.listAllLectures();
         break;
       case 2:
+        h.listAllStudents();
         break;
       case 3:
         break;
