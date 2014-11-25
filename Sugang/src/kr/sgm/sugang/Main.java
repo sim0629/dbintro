@@ -24,7 +24,8 @@ public final class Main {
     boolean exit = false;
     while(!exit) {
       printMenu();
-      switch(readCode()) {
+      int code = tryScanInt("Select your action", 0); // 잘못된 명령이 들어오면 종료
+      switch(code) {
       case 1:
         h.listAllLectures();
         break;
@@ -64,15 +65,18 @@ public final class Main {
     System.out.println(separator);
   }
 
-  private static int readCode() {
-    System.out.print("Select your action: ");
+  private static int tryScanInt(String prompt, int defaultValue) {
+    try {
+      return scanInt(prompt);
+    }catch(InputMismatchException ex) {
+      return defaultValue;
+    }
+  }
+
+  private static int scanInt(String prompt) throws InputMismatchException {
+    System.out.printf("%s: ", prompt);
     @SuppressWarnings("resource")
     Scanner in = new Scanner(System.in);
-    try {
-      return in.nextInt();
-    }catch(InputMismatchException ex) {
-      // 잘못된 입력이 들어오면 종료
-      return 0;
-    }
+    return in.nextInt();
   }
 }
