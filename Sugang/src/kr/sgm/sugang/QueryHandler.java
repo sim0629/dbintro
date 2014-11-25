@@ -17,6 +17,9 @@ class QueryHandler {
     "FROM student " +
     "ORDER BY student.id";
 
+  private static final String SQL_INSERT_LECTURE =
+    "INSERT INTO lecture VALUES ((SELECT MAX(id) + 1 FROM lecture), ?, ?, ?)";
+
   private static final String SEP_LECTURES =
     "----------------------------------------------------------------------";
   private static final String[] HEADER_LECTURES =
@@ -80,5 +83,22 @@ class QueryHandler {
       System.out.println();
     }
     System.out.println(SEP_STUDENTS);
+  }
+
+  void insertLecture(String name, int credit, int capacity) throws SQLException {
+    if(credit <= 0) {
+      System.out.println(Messages.INSERT_LECERR_CREDIT);
+      return;
+    }
+    if(capacity <= 0) {
+      System.out.println(Messages.INSERT_LECERR_CAPACITY);
+      return;
+    }
+    PreparedStatement ps = con.prepareStatement(SQL_INSERT_LECTURE);
+    ps.setString(1, name);
+    ps.setInt(2, credit);
+    ps.setInt(3, capacity);
+    ps.executeUpdate();
+    System.out.println(Messages.INSERT_LEC_SUCCESS);
   }
 }

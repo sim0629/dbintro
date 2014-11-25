@@ -33,6 +33,10 @@ public final class Main {
         h.listAllStudents();
         break;
       case 3:
+        String lectureName = scanString("Input lecture name");
+        int lectureCredit = tryScanInt("Input lecture credit", 0);
+        int lectureCapacity = tryScanInt("Input lecture capacity", 0);
+        h.insertLecture(lectureName, lectureCredit, lectureCapacity);
         break;
       case 4:
         break;
