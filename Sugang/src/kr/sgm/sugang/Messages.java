@@ -7,8 +7,12 @@ final class Messages {
     "A Student is successfully inserted.";
   static final String DELETE_LEC_SUCCESS =
     "A Lecture is successfully deleted.";
+  static final String DELETE_LEC_FAIL =
+    "No such lecture.";
   static final String DELETE_STU_SUCCESS =
     "A Student is successfully deleted.";
+  static final String DELETE_STU_FAIL =
+    "No such student.";
   static final String INSERT_LECERR_CREDIT =
     "Credit should be over 0.";
   static final String INSERT_LECERR_CAPACITY =
