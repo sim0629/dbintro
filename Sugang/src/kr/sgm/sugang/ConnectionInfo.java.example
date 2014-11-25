@@ -1,0 +1,25 @@
+package kr.sgm.sugang;
+
+final class ConnectionInfo {
+  static final String DRIVER_NAME =
+    "oracle.jdbc.driver.OracleDriver";
+  static final String SERVER_NAME =
+    "0.0.0.0";
+  static final String PORT_NUMBER =
+    "1521";
+  static final String SID =
+    "sid";
+  static final String URL =
+    "jdbc:oracle:thin:@" +
+    SERVER_NAME + ":" +
+    PORT_NUMBER + ":" +
+    SID;
+  static final String USER =
+    "user";
+  static final String PASS =
+    "pass";
+
+  private ConnectionInfo() {
+    throw new IllegalStateException("Don't instanciate it");
+  }
+}
