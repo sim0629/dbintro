@@ -20,6 +20,9 @@ class QueryHandler {
   private static final String SQL_INSERT_LECTURE =
     "INSERT INTO lecture VALUES ((SELECT MAX(id) + 1 FROM lecture), ?, ?, ?)";
 
+  private static final String SQL_REMOVE_LECTURE =
+    "DELETE FROM lecture WHERE id = ?";
+
   private static final String SEP_LECTURES =
     "----------------------------------------------------------------------";
   private static final String[] HEADER_LECTURES =
@@ -100,5 +103,12 @@ class QueryHandler {
     ps.setInt(3, capacity);
     ps.executeUpdate();
     System.out.println(Messages.INSERT_LEC_SUCCESS);
+  }
+
+  void removeLecture(int id) throws SQLException {
+    PreparedStatement ps = con.prepareStatement(SQL_REMOVE_LECTURE);
+    ps.setInt(1, id);
+    int n = ps.executeUpdate();
+    System.out.println(n > 0 ? Messages.DELETE_LEC_SUCCESS : Messages.DELETE_LEC_FAIL);
   }
 }

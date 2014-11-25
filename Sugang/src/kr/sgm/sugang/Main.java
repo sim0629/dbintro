@@ -39,6 +39,8 @@ public final class Main {
         h.insertLecture(lectureName, lectureCredit, lectureCapacity);
         break;
       case 4:
+        int lectureId = tryScanInt("Input lecture id", 0);
+        h.removeLecture(lectureId);
         break;
       case 5:
         break;
