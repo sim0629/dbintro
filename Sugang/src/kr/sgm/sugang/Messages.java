@@ -7,12 +7,12 @@ final class Messages {
     "A Student is successfully inserted.";
   static final String DELETE_LEC_SUCCESS =
     "A Lecture is successfully deleted.";
-  static final String DELETE_LEC_FAIL =
-    "No such lecture.";
+  static final String LEC_NOT_EXIST_D =
+    "Lecture %d doesn't exist";
   static final String DELETE_STU_SUCCESS =
     "A Student is successfully deleted.";
-  static final String DELETE_STU_FAIL =
-    "No such student.";
+  static final String STU_NOT_EXIST_S =
+    "Student %s doesn't exist";
   static final String INSERT_LECERR_CREDIT =
     "Credit should be over 0.";
   static final String INSERT_LECERR_CAPACITY =
@@ -25,6 +25,10 @@ final class Messages {
     "Capacity of a lecture is full.";
   static final String INSERT_REGISTRERR_CREDIT =
     "No remaining credits.";
+  static final String WRONG_SELECTION_DD =
+    "Please select %d~%d";
+  static final String WRONG_INPUTTYPE =
+    "Wrong input type";
 
   private Messages() {
     throw new IllegalStateException("Don't instanciate it");

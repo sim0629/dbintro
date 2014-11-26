@@ -109,6 +109,8 @@ class QueryHandler {
     PreparedStatement ps = con.prepareStatement(SQL_REMOVE_LECTURE);
     ps.setInt(1, id);
     int n = ps.executeUpdate();
-    System.out.println(n > 0 ? Messages.DELETE_LEC_SUCCESS : Messages.DELETE_LEC_FAIL);
+    if(n > 0) System.out.print(Messages.DELETE_LEC_SUCCESS);
+    else System.out.printf(Messages.LEC_NOT_EXIST_D, id);
+    System.out.println();
   }
 }

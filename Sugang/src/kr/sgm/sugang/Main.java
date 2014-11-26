@@ -24,8 +24,13 @@ public final class Main {
     boolean exit = false;
     while(!exit) {
       printMenu();
-      int code = tryScanInt("Select your action", 0); // 잘못된 명령이 들어오면 종료
-      switch(code) {
+      // action은 int가 아닐 수도 있기 때문에
+      // action이 int로 파싱되지 않는 것은
+      // WRONG_INPUTTYPE이 아니다.
+      // 기본값을 0으로 주고 WRONG_SELECTION으로 처리되게 한다.
+      int action = tryScanInt("Select your action", 0);
+      boolean wrong = false;
+      switch(action) {
       case 1:
         h.listAllLectures();
         break;
@@ -33,14 +38,29 @@ public final class Main {
         h.listAllStudents();
         break;
       case 3:
+        // 일단 모든 input을 받고
+        // credit과 capacity 중 하나라도 int로 파싱되지 않으면
+        // WRONG_INPUTTYPE을 한 번만 출력하고
+        // insert는 시도하지 않는다.
+        int lectureCredit = 0;
+        int lectureCapacity = 0;
         String lectureName = scanString("Input lecture name");
-        int lectureCredit = tryScanInt("Input lecture credit", 0);
-        int lectureCapacity = tryScanInt("Input lecture capacity", 0);
-        h.insertLecture(lectureName, lectureCredit, lectureCapacity);
+        try { lectureCredit = scanInt("Input lecture credit"); }
+        catch(InputMismatchException ex) { wrong = true; }
+        try { lectureCapacity = scanInt("Input lecture capacity"); }
+        catch(InputMismatchException ex) { wrong = true; }
+        if(wrong) System.out.println(Messages.WRONG_INPUTTYPE);
+        else h.insertLecture(lectureName, lectureCredit, lectureCapacity);
         break;
       case 4:
-        int lectureId = tryScanInt("Input lecture id", 0);
-        h.removeLecture(lectureId);
+        // id가 int로 파싱되지 않으면
+        // WRONG_INPUTTYPE을 출력하고
+        // remove는 시도하지 않는다.
+        int lectureId = 0;
+        try { lectureId = scanInt("Input lecture id"); }
+        catch(InputMismatchException ex) { wrong = true; }
+        if(wrong) System.out.println(Messages.WRONG_INPUTTYPE);
+        else h.removeLecture(lectureId);
         break;
       case 5:
         break;
@@ -52,9 +72,12 @@ public final class Main {
         break;
       case 9:
         break;
-      default:
-        // [1-9] 이외의 명령이 들어오면 종료
+      case 10:
         exit = true;
+        break;
+      default:
+        System.out.printf(Messages.WRONG_SELECTION_DD, 1, 10);
+        System.out.println();
         break;
       }
     }
