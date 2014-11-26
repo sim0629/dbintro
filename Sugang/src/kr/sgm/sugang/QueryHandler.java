@@ -53,8 +53,8 @@ class QueryHandler {
     "             FROM lecture " +
     "             WHERE lecture.id IN (SELECT lecture_id " +
     "                                  FROM registration " +
-    "                                  WHERE student_id = student.id " +
-    "                                     OR lecture_id = ?))";
+    "                                  WHERE student_id = student.id) " +
+    "                OR lecture.id = ?)";
 
   private static final String SQL_REGISTER_CLASS =
     "INSERT INTO registration VALUES (?, ?)";
