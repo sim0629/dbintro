@@ -118,8 +118,14 @@ public final class Main {
       else h.registerClass(studentId, lectureId);
       break;
     case 8:
+      studentId = scanString("input student id");
+      h.listLectures(studentId);
       break;
     case 9:
+      try { lectureId = scanInt("Input lecture id"); }
+      catch(InputMismatchException ex) { wrong = true; }
+      if(wrong) System.out.println(Messages.WRONG_INPUTTYPE);
+      else h.listStudents(lectureId);
       break;
     case 10:
       return true;
