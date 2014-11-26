@@ -18,7 +18,7 @@ class QueryHandler {
     "ORDER BY student.id";
 
   private static final String SQL_INSERT_LECTURE =
-    "INSERT INTO lecture VALUES ((SELECT MAX(id) + 1 FROM lecture), ?, ?, ?)";
+    "INSERT INTO lecture VALUES ((SELECT NVL(MAX(id), 0) + 1 FROM lecture), ?, ?, ?)";
 
   private static final String SQL_REMOVE_LECTURE =
     "DELETE FROM lecture WHERE id = ?";
