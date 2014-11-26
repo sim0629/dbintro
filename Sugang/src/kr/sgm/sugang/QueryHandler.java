@@ -23,6 +23,12 @@ class QueryHandler {
   private static final String SQL_REMOVE_LECTURE =
     "DELETE FROM lecture WHERE id = ?";
 
+  private static final String SQL_INSERT_STUDENT =
+    "INSERT INTO student VALUES (?, ?)";
+
+  private static final String SQL_REMOVE_STUDENT =
+    "DELETE FROM student WHERE id = ?";
+
   private static final String SEP_LECTURES =
     "----------------------------------------------------------------------";
   private static final String[] HEADER_LECTURES =
@@ -111,6 +117,23 @@ class QueryHandler {
     int n = ps.executeUpdate();
     if(n > 0) System.out.print(Messages.DELETE_LEC_SUCCESS);
     else System.out.printf(Messages.LEC_NOT_EXIST_D, id);
+    System.out.println();
+  }
+
+  void insertStudent(String name, String id) throws SQLException {
+    PreparedStatement ps = con.prepareStatement(SQL_INSERT_STUDENT);
+    ps.setString(1, id);
+    ps.setString(2, name);
+    ps.executeUpdate();
+    System.out.println(Messages.INSERT_STU_SUCCESS);
+  }
+
+  void removeStudent(String id) throws SQLException {
+    PreparedStatement ps = con.prepareStatement(SQL_REMOVE_STUDENT);
+    ps.setString(1, id);
+    int n = ps.executeUpdate();
+    if(n > 0) System.out.print(Messages.DELETE_STU_SUCCESS);
+    else System.out.printf(Messages.STU_NOT_EXIST_S, id);
     System.out.println();
   }
 }

@@ -30,6 +30,7 @@ public final class Main {
       // 기본값을 0으로 주고 WRONG_SELECTION으로 처리되게 한다.
       int action = tryScanInt("Select your action", 0);
       boolean wrong = false;
+      String studentId;
       switch(action) {
       case 1:
         h.listAllLectures();
@@ -63,8 +64,18 @@ public final class Main {
         else h.removeLecture(lectureId);
         break;
       case 5:
+        // id가 'nnnn-nnnnn' 형식이 아니면
+        // INSERT_STUERR_FORMAT을 출력하고
+        // insert는 시도하지 않는다.
+        String studentName = scanString("Input student name");
+        studentId = scanString("Input student id");
+        wrong = !studentId.matches("\\d\\d\\d\\d\\-\\d\\d\\d\\d\\d");
+        if(wrong) System.out.println(Messages.INSERT_STUERR_FORMAT);
+        else h.insertStudent(studentName, studentId);
         break;
       case 6:
+        studentId = scanString("Input student id");
+        h.removeStudent(studentId);
         break;
       case 7:
         break;
