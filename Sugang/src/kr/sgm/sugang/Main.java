@@ -30,6 +30,7 @@ public final class Main {
       // 기본값을 0으로 주고 WRONG_SELECTION으로 처리되게 한다.
       int action = tryScanInt("Select your action", 0);
       boolean wrong = false;
+      int lectureId = 0;
       String studentId;
       switch(action) {
       case 1:
@@ -57,7 +58,6 @@ public final class Main {
         // id가 int로 파싱되지 않으면
         // WRONG_INPUTTYPE을 출력하고
         // remove는 시도하지 않는다.
-        int lectureId = 0;
         try { lectureId = scanInt("Input lecture id"); }
         catch(InputMismatchException ex) { wrong = true; }
         if(wrong) System.out.println(Messages.WRONG_INPUTTYPE);
