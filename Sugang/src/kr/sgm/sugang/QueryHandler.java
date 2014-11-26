@@ -29,6 +29,36 @@ class QueryHandler {
   private static final String SQL_REMOVE_STUDENT =
     "DELETE FROM student WHERE id = ?";
 
+  private static final String SQL_CHECK_STUDENT_EXIST =
+    "SELECT COUNT(*) " +
+    "FROM student " +
+    "WHERE id = ?";
+
+  private static final String SQL_CHECK_LECTURE_EXIST =
+    "SELECT COUNT(*) " +
+    "FROM lecture " +
+    "WHERE id = ?";
+
+  private static final String SQL_CHECK_CAPACITY =
+    "SELECT COUNT(*) " +
+    "FROM lecture " +
+    "WHERE id = ? " +
+    "  AND capacity > (SELECT COUNT(*) FROM registration WHERE lecture_id = id)";
+
+  private static final String SQL_CHECK_CREDIT =
+    "SELECT COUNT(*) " +
+    "FROM student " +
+    "WHERE student.id = ? " +
+    "  AND 18 >= (SELECT NVL(SUM(credit), 0) " +
+    "             FROM lecture " +
+    "             WHERE lecture.id IN (SELECT lecture_id " +
+    "                                  FROM registration " +
+    "                                  WHERE student_id = student.id " +
+    "                                     OR lecture_id = ?))";
+
+  private static final String SQL_REGISTER_CLASS =
+    "INSERT INTO registration VALUES (?, ?)";
+
   private static final String SEP_LECTURES =
     "----------------------------------------------------------------------";
   private static final String[] HEADER_LECTURES =
@@ -135,5 +165,61 @@ class QueryHandler {
     if(n > 0) System.out.print(Messages.DELETE_STU_SUCCESS);
     else System.out.printf(Messages.STU_NOT_EXIST_S, id);
     System.out.println();
+  }
+
+  void registerClass(String studentId, int lectureId) throws SQLException {
+    // check the student exists
+    PreparedStatement ps = con.prepareStatement(SQL_CHECK_STUDENT_EXIST);
+    ps.setString(1, studentId);
+    ResultSet rs = ps.executeQuery();
+    rs.next();
+    int value = rs.getInt(1);
+    if(value == 0) {
+      System.out.printf(Messages.STU_NOT_EXIST_S, studentId);
+      System.out.println();
+      return;
+    }
+
+    // check the lecture exists
+    ps = con.prepareStatement(SQL_CHECK_LECTURE_EXIST);
+    ps.setInt(1, lectureId);
+    rs = ps.executeQuery();
+    rs.next();
+    value = rs.getInt(1);
+    if(value == 0) {
+      System.out.printf(Messages.LEC_NOT_EXIST_D, lectureId);
+      System.out.println();
+      return;
+    }
+
+    // check the capacity
+    ps = con.prepareStatement(SQL_CHECK_CAPACITY);
+    ps.setInt(1, lectureId);
+    rs = ps.executeQuery();
+    rs.next();
+    value = rs.getInt(1);
+    if(value == 0) {
+      System.out.println(Messages.INSERT_REGISTRERR_CAPACITY);
+      return;
+    }
+
+    // check the credit
+    ps = con.prepareStatement(SQL_CHECK_CREDIT);
+    ps.setString(1, studentId);
+    ps.setInt(2, lectureId);
+    rs = ps.executeQuery();
+    rs.next();
+    value = rs.getInt(1);
+    if(value == 0) {
+      System.out.println(Messages.INSERT_REGISTRERR_CREDIT);
+      return;
+    }
+
+    // register
+    ps = con.prepareStatement(SQL_REGISTER_CLASS);
+    ps.setInt(1, lectureId);
+    ps.setString(2, studentId);
+    ps.executeUpdate();
+    System.out.println(Messages.INSERT_REGISTR_SUCCESS);
   }
 }

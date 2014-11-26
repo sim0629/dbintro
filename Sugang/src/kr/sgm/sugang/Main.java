@@ -78,6 +78,14 @@ public final class Main {
         h.removeStudent(studentId);
         break;
       case 7:
+        // lecture id가 int로 파싱되지 않으면
+        // WRONG_INPUTTYPE을 출력하고
+        // register는 시도하지 않는다.
+        studentId = scanString("Input student id");
+        try { lectureId = scanInt("Input lecture id"); }
+        catch(InputMismatchException ex) { wrong = true; }
+        if(wrong) System.out.println(Messages.WRONG_INPUTTYPE);
+        else h.registerClass(studentId, lectureId);
         break;
       case 8:
         break;
