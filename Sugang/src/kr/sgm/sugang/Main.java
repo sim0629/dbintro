@@ -109,6 +109,7 @@ public final class Main {
       h.listStudents(lectureId);
       break;
     case 10:
+      System.out.println("Thanks!");
       return true;
     default:
       System.out.printf(Messages.WRONG_SELECTION_DD, 1, 10);
