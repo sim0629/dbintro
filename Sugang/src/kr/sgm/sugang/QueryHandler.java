@@ -138,14 +138,6 @@ class QueryHandler {
   }
 
   void insertLecture(String name, int credit, int capacity) throws SQLException {
-    if(credit <= 0) {
-      System.out.println(Messages.INSERT_LECERR_CREDIT);
-      return;
-    }
-    if(capacity <= 0) {
-      System.out.println(Messages.INSERT_LECERR_CAPACITY);
-      return;
-    }
     PreparedStatement ps = con.prepareStatement(SQL_INSERT_LECTURE);
     ps.setString(1, name);
     ps.setInt(2, credit);
