@@ -234,10 +234,23 @@ class QueryHandler {
     return true;
   }
 
-  void listLectures(String studentId) throws SQLException {
-    PreparedStatement ps = con.prepareStatement(SQL_LIST_LECTURES);
+  // 성공 여부 리턴
+  boolean listLectures(String studentId) throws SQLException {
+    // check the student exists
+    PreparedStatement ps = con.prepareStatement(SQL_CHECK_STUDENT_EXIST);
     ps.setString(1, studentId);
     ResultSet rs = ps.executeQuery();
+    rs.next();
+    int v = rs.getInt(1);
+    if(v == 0) {
+      System.out.printf(Messages.STU_NOT_EXIST_S, studentId);
+      System.out.println();
+      return false;
+    }
+
+    ps = con.prepareStatement(SQL_LIST_LECTURES);
+    ps.setString(1, studentId);
+    rs = ps.executeQuery();
     System.out.println(SEP_LECTURES);
     for(int i = 0; i < HEADER_LECTURES.length; i++)
       System.out.printf(String.format("%%-%ds", MAXLEN_LECTURES[i] + 1), HEADER_LECTURES[i]);
@@ -252,12 +265,26 @@ class QueryHandler {
       System.out.println();
     }
     System.out.println(SEP_LECTURES);
+    return true;
   }
 
-  void listStudents(int lectureId) throws SQLException {
-    PreparedStatement ps = con.prepareStatement(SQL_LIST_STUDENTS);
+  // 성공 여부 리턴
+  boolean listStudents(int lectureId) throws SQLException {
+    // check the lecture exists
+    PreparedStatement ps = con.prepareStatement(SQL_CHECK_LECTURE_EXIST);
     ps.setInt(1, lectureId);
     ResultSet rs = ps.executeQuery();
+    rs.next();
+    int v = rs.getInt(1);
+    if(v == 0) {
+      System.out.printf(Messages.LEC_NOT_EXIST_D, lectureId);
+      System.out.println();
+      return false;
+    }
+
+    ps = con.prepareStatement(SQL_LIST_STUDENTS);
+    ps.setInt(1, lectureId);
+    rs = ps.executeQuery();
     System.out.println(SEP_STUDENTS);
     for(int i = 0; i < HEADER_STUDENTS.length - 1; i++)
       System.out.printf(String.format("%%-%ds", MAXLEN_STUDENTS[i] + 1), HEADER_STUDENTS[i]);
@@ -272,5 +299,6 @@ class QueryHandler {
       System.out.println();
     }
     System.out.println(SEP_STUDENTS);
+    return true;
   }
 }

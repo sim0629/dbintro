@@ -106,11 +106,11 @@ public final class Main {
       break;
     case 8:
       studentId = scanString("input student id");
-      h.listLectures(studentId);
+      if(!h.listLectures(studentId)) return 2;
       break;
     case 9:
       lectureId = scanInt("Input lecture id");
-      h.listStudents(lectureId);
+      if(!h.listStudents(lectureId)) return 2;
       break;
     case 10:
       System.out.println("Thanks!");
