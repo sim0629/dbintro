@@ -146,13 +146,15 @@ class QueryHandler {
     System.out.println(Messages.INSERT_LEC_SUCCESS);
   }
 
-  void removeLecture(int id) throws SQLException {
+  // 성공 여부 리턴
+  boolean removeLecture(int id) throws SQLException {
     PreparedStatement ps = con.prepareStatement(SQL_REMOVE_LECTURE);
     ps.setInt(1, id);
     int n = ps.executeUpdate();
     if(n > 0) System.out.print(Messages.DELETE_LEC_SUCCESS);
     else System.out.printf(Messages.LEC_NOT_EXIST_D, id);
     System.out.println();
+    return n > 0;
   }
 
   void insertStudent(String name, String id) throws SQLException {
@@ -163,16 +165,19 @@ class QueryHandler {
     System.out.println(Messages.INSERT_STU_SUCCESS);
   }
 
-  void removeStudent(String id) throws SQLException {
+  // 성공 여부 리턴
+  boolean removeStudent(String id) throws SQLException {
     PreparedStatement ps = con.prepareStatement(SQL_REMOVE_STUDENT);
     ps.setString(1, id);
     int n = ps.executeUpdate();
     if(n > 0) System.out.print(Messages.DELETE_STU_SUCCESS);
     else System.out.printf(Messages.STU_NOT_EXIST_S, id);
     System.out.println();
+    return n > 0;
   }
 
-  void registerClass(String studentId, int lectureId) throws SQLException {
+  // 성공 여부 리턴
+  boolean registerClass(String studentId, int lectureId) throws SQLException {
     // check the student exists
     PreparedStatement ps = con.prepareStatement(SQL_CHECK_STUDENT_EXIST);
     ps.setString(1, studentId);
@@ -182,7 +187,7 @@ class QueryHandler {
     if(value == 0) {
       System.out.printf(Messages.STU_NOT_EXIST_S, studentId);
       System.out.println();
-      return;
+      return false;
     }
 
     // check the lecture exists
@@ -194,7 +199,7 @@ class QueryHandler {
     if(value == 0) {
       System.out.printf(Messages.LEC_NOT_EXIST_D, lectureId);
       System.out.println();
-      return;
+      return false;
     }
 
     // check the capacity
@@ -205,7 +210,7 @@ class QueryHandler {
     value = rs.getInt(1);
     if(value == 0) {
       System.out.println(Messages.INSERT_REGISTRERR_CAPACITY);
-      return;
+      return false;
     }
 
     // check the credit
@@ -217,7 +222,7 @@ class QueryHandler {
     value = rs.getInt(1);
     if(value == 0) {
       System.out.println(Messages.INSERT_REGISTRERR_CREDIT);
-      return;
+      return false;
     }
 
     // register
@@ -226,6 +231,7 @@ class QueryHandler {
     ps.setString(2, studentId);
     ps.executeUpdate();
     System.out.println(Messages.INSERT_REGISTR_SUCCESS);
+    return true;
   }
 
   void listLectures(String studentId) throws SQLException {
