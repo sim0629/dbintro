@@ -20,19 +20,23 @@ public final class Main {
   private static String separator =
     "============================================";
 
+  private static final int STATUS_EXIT = 0;
+  private static final int STATUS_GOOD = 1;
+  private static final int STATUS_BAD = 2;
+
   private static QueryHandler h = null;
 
   public static void main(String[] args) throws ClassNotFoundException {
-    int ret = 1; // 0: 종료, 1:정상, 2:에러
+    int status = STATUS_GOOD;
     int action = 0;
-    while(ret > 0) {
-      if(ret == 1) { // 정상 처리되었을 때에만 메뉴를 다시 보여줌
+    while(status != STATUS_EXIT) {
+      if(status == STATUS_GOOD) { // 정상 처리되었을 때에만 메뉴를 다시 보여줌
         printMenu();
         action = scanInt("Select your action");
       }
       try {
         if(h == null) h = new QueryHandler();
-        ret = doAction(action);
+        status = doAction(action);
       }catch(SQLException ex) {
         // Messages에 정의되지 않은 예외를 잡아서 알려준다.
         // insert 할 때
@@ -57,7 +61,6 @@ public final class Main {
   }
 
   // action을 수행하고 상태 코드를 리턴한다.
-  // 0: 종료, 1:정상, 2:에러
   private static int doAction(int action) throws SQLException {
     int lectureId = 0;
     String studentId;
@@ -88,7 +91,7 @@ public final class Main {
       break;
     case 4:
       lectureId = scanInt("Input lecture id");
-      if(!h.removeLecture(lectureId)) return 2;
+      if(!h.removeLecture(lectureId)) return STATUS_BAD;
       break;
     case 5:
       String studentName = scanString("Input student name");
@@ -97,30 +100,30 @@ public final class Main {
       break;
     case 6:
       studentId = scanString("Input student id");
-      if(!h.removeStudent(studentId)) return 2;
+      if(!h.removeStudent(studentId)) return STATUS_BAD;
       break;
     case 7:
       studentId = scanString("Input student id");
       lectureId = scanInt("Input lecture id");
-      if(!h.registerClass(studentId, lectureId)) return 2;
+      if(!h.registerClass(studentId, lectureId)) return STATUS_BAD;
       break;
     case 8:
       studentId = scanString("input student id");
-      if(!h.listLectures(studentId)) return 2;
+      if(!h.listLectures(studentId)) return STATUS_BAD;
       break;
     case 9:
       lectureId = scanInt("Input lecture id");
-      if(!h.listStudents(lectureId)) return 2;
+      if(!h.listStudents(lectureId)) return STATUS_BAD;
       break;
     case 10:
       System.out.println("Thanks!");
-      return 0;
+      return STATUS_EXIT;
     default:
       System.out.printf(Messages.WRONG_SELECTION_DD, 1, 10);
       System.out.println();
       break;
     }
-    return 1;
+    return STATUS_GOOD;
   }
 
   private static int scanInt(String prompt) {
