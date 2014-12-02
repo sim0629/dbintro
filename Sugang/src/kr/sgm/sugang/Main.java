@@ -32,7 +32,13 @@ public final class Main {
     while(status != STATUS_EXIT) {
       if(status == STATUS_GOOD) { // 정상 처리되었을 때에만 메뉴를 다시 보여줌
         printMenu();
-        action = scanInt("Select your action");
+        String actionString = scanString("Select your action");
+        try {
+          action = Integer.parseInt(actionString);
+        }catch(NumberFormatException ex) {
+          // int로 파싱되지 않는 메뉴가 선택되면 0으로 간주한다
+          action = 0;
+        }
       }
       try {
         if(h == null) h = new QueryHandler();
