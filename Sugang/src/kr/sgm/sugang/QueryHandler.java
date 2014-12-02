@@ -178,6 +178,8 @@ class QueryHandler {
 
   // 성공 여부 리턴
   boolean registerClass(String studentId, int lectureId) throws SQLException {
+    boolean bad = false;
+
     // check the student exists
     PreparedStatement ps = con.prepareStatement(SQL_CHECK_STUDENT_EXIST);
     ps.setString(1, studentId);
@@ -187,7 +189,7 @@ class QueryHandler {
     if(value == 0) {
       System.out.printf(Messages.STU_NOT_EXIST_S, studentId);
       System.out.println();
-      return false;
+      bad = true;
     }
 
     // check the lecture exists
@@ -199,8 +201,10 @@ class QueryHandler {
     if(value == 0) {
       System.out.printf(Messages.LEC_NOT_EXIST_D, lectureId);
       System.out.println();
-      return false;
+      bad = true;
     }
+
+    if(bad) return false;
 
     // check the capacity
     ps = con.prepareStatement(SQL_CHECK_CAPACITY);
@@ -210,7 +214,7 @@ class QueryHandler {
     value = rs.getInt(1);
     if(value == 0) {
       System.out.println(Messages.INSERT_REGISTRERR_CAPACITY);
-      return false;
+      bad = true;
     }
 
     // check the credit
@@ -222,8 +226,10 @@ class QueryHandler {
     value = rs.getInt(1);
     if(value == 0) {
       System.out.println(Messages.INSERT_REGISTRERR_CREDIT);
-      return false;
+      bad = true;
     }
+
+    if(bad) return false;
 
     // register
     ps = con.prepareStatement(SQL_REGISTER_CLASS);
