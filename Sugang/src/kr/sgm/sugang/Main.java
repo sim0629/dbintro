@@ -105,11 +105,11 @@ public final class Main {
       h.insertStudent(studentName, studentId);
       break;
     case 6:
-      studentId = scanString("Input student id");
+      studentId = scanStringAndCheck("Input student id", "\\d\\d\\d\\d\\-\\d\\d\\d\\d\\d");
       if(!h.removeStudent(studentId)) return STATUS_BAD;
       break;
     case 7:
-      studentId = scanString("Input student id");
+      studentId = scanStringAndCheck("Input student id", "\\d\\d\\d\\d\\-\\d\\d\\d\\d\\d");
       lectureId = scanInt("Input lecture id");
       if(!h.registerClass(studentId, lectureId)) return STATUS_BAD;
       break;
@@ -158,7 +158,7 @@ public final class Main {
     while(true) {
       String s = scanString(prompt);
       if(s.matches(pattern)) return s;
-      System.out.println(Messages.WRONG_INPUTTYPE);
+      System.out.println(Messages.INSERT_STUERR_FORMAT);
     }
   }
 }
